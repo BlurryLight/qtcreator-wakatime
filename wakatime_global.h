@@ -1,0 +1,9 @@
+#pragma once
+
+#include <QtGlobal>
+
+#if defined(QTCREATORWAKATIME_LIBRARY)
+#  define QTCREATORWAKATIMESHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define QTCREATORWAKATIMESHARED_EXPORT Q_DECL_IMPORT
+#endif
