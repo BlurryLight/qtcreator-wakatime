@@ -209,7 +209,6 @@ void WakaPlugin::onEditorChanged(Core::IEditor *editor)
 
 void WakaPlugin::onAboutToSave(Core::IDocument *document)
 {
-
     trySendHeartbeat(document->filePath().toString(), true);
 }
 
