@@ -3,7 +3,7 @@
 
 #include <coreplugin/icore.h>
 
-namespace QtCreatorWakatime {
+namespace Wakatime {
 namespace Internal {
 
 namespace

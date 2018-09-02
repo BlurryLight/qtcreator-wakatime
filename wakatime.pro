@@ -1,6 +1,6 @@
-DEFINES += QTCREATORWAKATIME_LIBRARY
+DEFINES += WAKATIME_LIBRARY
 
-# QtCreatorWakatime files
+# Wakatime files
 
 SOURCES += \
     waka_plugin.cpp \
@@ -48,7 +48,7 @@ USE_USER_DESTDIR = yes
 ###### <dirname>_dependencies.pri, where <dirname> is the name of the directory containing the
 ###### plugin's sources.
 
-QTC_PLUGIN_NAME = QtCreatorWakatime
+QTC_PLUGIN_NAME = Wakatime
 QTC_LIB_DEPENDS += \
     # nothing here at this time
 

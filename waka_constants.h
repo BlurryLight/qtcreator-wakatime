@@ -1,6 +1,6 @@
 #pragma once
 
-namespace QtCreatorWakatime {
+namespace Wakatime {
 namespace Constants {
 
 const char SETTINGS_GROUP[] = "Wakatime";

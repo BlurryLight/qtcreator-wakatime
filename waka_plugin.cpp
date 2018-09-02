@@ -24,17 +24,12 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QAction>
-#include <QMessageBox>
-#include <QMainWindow>
-#include <QMenu>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QToolButton>
 #include <QTimer>
-#include <QStringLiteral>
 
-namespace QtCreatorWakatime {
+namespace Wakatime {
 namespace Internal {
 
 WakaPlugin::WakaPlugin()

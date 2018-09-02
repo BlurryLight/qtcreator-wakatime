@@ -11,7 +11,7 @@ namespace Ui {
 class WakaOptionsForm;
 }
 
-namespace QtCreatorWakatime {
+namespace Wakatime {
 namespace Internal {
 
 class WakaOptions;

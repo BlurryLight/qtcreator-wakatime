@@ -4,7 +4,7 @@
 
 #include <QCoreApplication>
 
-namespace QtCreatorWakatime {
+namespace Wakatime {
 namespace Internal {
 
 WakaOptionsPage::WakaOptionsPage(const QSharedPointer<WakaOptions> &options, QObject *parent) : Core::IOptionsPage(parent), _options(options)

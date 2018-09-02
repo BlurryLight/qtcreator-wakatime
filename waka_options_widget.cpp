@@ -2,7 +2,7 @@
 #include "ui_waka_options.h"
 #include "waka_options.h"
 
-namespace QtCreatorWakatime {
+namespace Wakatime {
 namespace Internal {
 
 WakaOptionsWidget::WakaOptionsWidget(const QSharedPointer<WakaOptions> &options, QWidget *parent) :

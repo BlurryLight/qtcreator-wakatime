@@ -7,7 +7,7 @@
 #include <QWidget>
 
 
-namespace QtCreatorWakatime {
+namespace Wakatime {
 namespace Internal {
 
 class WakaOptions : public QObject

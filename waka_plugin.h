@@ -16,7 +16,7 @@ namespace Core {
     class IDocument;
 }
 
-namespace QtCreatorWakatime {
+namespace Wakatime {
 namespace Internal {
 
 class WakaOptions;
@@ -25,7 +25,7 @@ class WakaOptionsPage;
 class WakaPlugin : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "QtCreatorWakatime.json")
+    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "Wakatime.json")
 
 public:
     WakaPlugin();

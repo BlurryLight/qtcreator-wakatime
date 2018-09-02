@@ -8,7 +8,7 @@
 #include <QPointer>
 #include <QWidget>
 
-namespace QtCreatorWakatime {
+namespace Wakatime {
 namespace Internal {
 
 class WakaOptionsPage : public Core::IOptionsPage

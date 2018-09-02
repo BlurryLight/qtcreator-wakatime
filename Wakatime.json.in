@@ -1,7 +1,7 @@
 {
-    \"Name\" : \"QtCreatorWakatime\",
-    \"Version\" : \"0.0.1\",
-    \"CompatVersion\" : \"0.0.1\",
+    \"Name\" : \"Wakatime\",
+    \"Version\" : \"0.1.0\",
+    \"CompatVersion\" : \"0.1.0\",
     \"Vendor\" : \"Igor K.\",
     \"Copyright\" : \"(C) Igor K.\",
     \"License\" : \"This program is free software: you can redistribute it and/or modify
