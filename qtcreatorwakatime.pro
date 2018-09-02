@@ -3,18 +3,27 @@ DEFINES += QTCREATORWAKATIME_LIBRARY
 # QtCreatorWakatime files
 
 SOURCES += \
-    wakatime_options_page.cpp \
-    wakatime_plugin.cpp
+    waka_plugin.cpp \
+    waka_options.cpp \
+    waka_options_page.cpp \
+    waka_options_widget.cpp
 
 HEADERS += \
-    wakatime_options_page.h \
-    wakatime_plugin.h \
-    wakatime_constants.h \
-    wakatime_global.h
+    waka_plugin.h \
+    waka_options.h \
+    waka_constants.h \
+    waka_global.h \
+    waka_options_page.h \
+    waka_options_widget.h
 
-QT      += core network
-LIBS    += -lProjectExplorer
-CONFIG  += c++14
+FORMS += \
+    waka_options.ui
+
+RESOURCES += \
+    waka.qrc
+
+QT += core network widgets
+CONFIG += c++17
 
 # Qt Creator linking
 ## Either set the IDE_SOURCE_TREE when running qmake,
@@ -44,7 +53,7 @@ QTC_LIB_DEPENDS += \
     # nothing here at this time
 
 QTC_PLUGIN_DEPENDS += \
-    coreplugin
+    coreplugin projectexplorer
 
 QTC_PLUGIN_RECOMMENDS += \
     # optional plugin dependencies. nothing here at this time
@@ -52,6 +61,3 @@ QTC_PLUGIN_RECOMMENDS += \
 ###### End _dependencies.pri contents ######
 
 include($$IDE_SOURCE_TREE/src/qtcreatorplugin.pri)
-
-FORMS += \
-    wakatime_options.ui
