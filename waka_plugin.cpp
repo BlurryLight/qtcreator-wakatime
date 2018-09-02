@@ -112,7 +112,7 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
         { "project", QString("") },
         { "exclude", QString("") },
         { "branch", QString("master") },
-        { "plugin", QString("Wakatime Plugin") },
+        { "plugin", QString("QtCreator Wakatime Plugin") },
         { "is_write", false },
         { "is_debugging", false },
         { "lineno", 1}
@@ -144,7 +144,7 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
     request.setSslConfiguration(config);
     request.setUrl(*_req_url.get());
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setHeader(QNetworkRequest::UserAgentHeader, "Qt");
+    request.setHeader(QNetworkRequest::UserAgentHeader, "Qt 5.11");
     _netManager->post(request, heartbeat_json);
 
     QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write(QString("Heartbeat send => %1 ").arg(QString::fromUtf8(heartbeat_json))));
