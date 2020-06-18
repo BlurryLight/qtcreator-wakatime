@@ -60,11 +60,13 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     new WakaOptionsPage(_wakaOptions, this);
 
     _netManager = new QNetworkAccessManager();
-
     connect(_netManager, &QNetworkAccessManager::finished, this, &WakaPlugin::onNetReply);
-    connect(_wakaOptions.get(), &WakaOptions::apiKeyChanged, this, &WakaPlugin::onApiKeyChanged);
-    connect(_wakaOptions.get(), &WakaOptions::ignorePaternChanged, this, &WakaPlugin::onIgnorePaternChanged);
-    connect(_wakaOptions.get(), &WakaOptions::inStatusBarChanged, this, &WakaPlugin::onInStatusBarChanged);
+    connect(_wakaOptions.data(), &WakaOptions::apiKeyChanged, this,
+            &WakaPlugin::onApiKeyChanged);
+    connect(_wakaOptions.data(), &WakaOptions::ignorePaternChanged, this,
+            &WakaPlugin::onIgnorePaternChanged);
+    connect(_wakaOptions.data(), &WakaOptions::inStatusBarChanged, this,
+            &WakaPlugin::onInStatusBarChanged);
 
     connect(Core::EditorManager::instance(), &Core::EditorManager::aboutToSave, this, &WakaPlugin::onAboutToSave);
     connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorAboutToChange, this, &WakaPlugin::onEditorAboutToChange);

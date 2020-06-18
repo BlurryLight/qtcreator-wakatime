@@ -51,7 +51,7 @@ private slots:
 
 private:
     qint64 _lastTime = 0;
-    QString _lastEntry = "";
+    QString _lastEntry{""};
 
     QString _ignore_patern;
     std::unique_ptr<QUrl> _req_url;
@@ -60,7 +60,8 @@ private:
     QSharedPointer<WakaOptions> _wakaOptions;
 
     const int64_t _cooldownTime = 120;
-    const QString _urlPrefix = "https://wakatime.com/api/v1/users/current/heartbeats?api_key=";
+    const QString _urlPrefix{
+        "https://wakatime.com/api/v1/users/current/heartbeats?api_key="};
 };
 
 } // namespace Internal

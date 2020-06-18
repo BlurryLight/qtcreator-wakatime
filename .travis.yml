@@ -1,16 +1,47 @@
-anguage: cpp
-
+language: cpp
 matrix:
     include:
         - os: linux
           compiler: gcc
           sudo: required
-          dist: trusty
-          env: QTC_VER=4.12 QTC_DL=linux_gcc_64_rhel72 QTP_OUTPUT_DIR=output
-
+          dist: xenial
+          env: QTC_VER=4.8 QTC_DL=linux_gcc_64_rhel72 QTP_OUTPUT_DIR=output QTC_SOURCE=qt-src QTC_BUILD=qt-bin
+        - os: linux
+          compiler: gcc
+          sudo: required
+          dist: xenial
+          env: QTC_VER=4.9 QTC_DL=linux_gcc_64_rhel72 QTP_OUTPUT_DIR=output QTC_SOURCE=qt-src QTC_BUILD=qt-bin
+        - os: linux
+          compiler: gcc
+          sudo: required
+          dist: xenial
+          env: QTC_VER=4.10 QTC_DL=linux_gcc_64_rhel72 QTP_OUTPUT_DIR=output QTC_SOURCE=qt-src QTC_BUILD=qt-bin
+        - os: linux
+          compiler: gcc
+          sudo: required
+          dist: xenial
+          env: QTC_VER=4.11 QTC_DL=linux_gcc_64_rhel72 QTP_OUTPUT_DIR=output QTC_SOURCE=qt-src QTC_BUILD=qt-bin
+        - os: linux
+          compiler: gcc
+          dist: xenial
+          env: QTC_VER=4.12 QTC_DL=linux_gcc_64_rhel72 QTP_OUTPUT_DIR=output QTC_SOURCE=qt-src QTC_BUILD=qt-bin
 install:
+    - chmod +x scripts/install_deps.sh
     - scripts/install_deps.sh
 before_script:
+    - chmod +x scripts/download_qtc.sh
     - scripts/download_qtc.sh
 script:
+    - chmod +x scripts/build.sh
     - scripts/build.sh
+before_deploy:
+    -  cd $QTP_OUTPUT_DIR && zip -r qtc-wakatime-linux-$QTC_VER.zip * && cd -
+deploy:
+    provider: releases
+    api_key: $GITHUB_TOKEN
+    file: $TRAVIS_BUILD_DIR/$QTP_OUTPUT_DIR/qtc-wakatime-linux-$QTC_VER.zip
+    skip_cleanup: true
+    overwrite: true
+    on:
+      tags: true
+    
