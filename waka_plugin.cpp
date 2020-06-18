@@ -90,12 +90,16 @@ void WakaPlugin::extensionsInitialized()
 
 ExtensionSystem::IPlugin::ShutdownFlag WakaPlugin::aboutToShutdown()
 {
-    // Save settings
-    // Disconnect from signals that are not needed during shutdown
-    // Hide UI (if you add UI that is not in the main window directly)
+  // Save settings
+  // Disconnect from signals that are not needed during shutdown
+  // Hide UI (if you add UI that is not in the main window directly)
 
-    trySendHeartbeat(Core::EditorManager::currentDocument()->filePath().toString(), true);
-    return SynchronousShutdown;
+  // don't do that. Potential race condition.
+  //    trySendHeartbeat(Core::EditorManager::currentDocument()->filePath().toString(),
+  //    true);
+  QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write(QString(
+                                           "Plugin is going to shutdown\n")));
+  return SynchronousShutdown;
 }
 
 void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
