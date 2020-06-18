@@ -1,0 +1,16 @@
+anguage: cpp
+
+matrix:
+    include:
+        - os: linux
+          compiler: gcc
+          sudo: required
+          dist: trusty
+          env: QTC_VER=4.12 QTC_DL=linux_gcc_64_rhel72 QTP_OUTPUT_DIR=output
+
+install:
+    - scripts/install_deps.sh
+before_script:
+    - scripts/download_qtc.sh
+script:
+    - scripts/build.sh
