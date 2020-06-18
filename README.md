@@ -1,4 +1,7 @@
 # Fork
+
+[![Build Status](https://travis-ci.org/BlurryLight/qtcreator-wakatime.svg?branch=master)](https://travis-ci.org/BlurryLight/qtcreator-wakatime)
+
 This repo is a fork of https://github.com/nonametr/qtcreator-wakatime. The original repo provides binary plugin up to Qtc4.9, which is too old to work with the latest Qtc.
 The Travis-CI is employed to automaticlly compile the plugin and deploy to the GITHUB RELEASES and some code has been modifed to enable the plugin to compile succefully in Qt 5.9LTS.
 
