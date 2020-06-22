@@ -201,9 +201,16 @@ void WakaPlugin::onInStatusBarChanged()
     }
 }
 
-void WakaPlugin::onNetReply(QNetworkReply *reply)
-{
-    QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write(QString("Network reply => %1").arg(QString::fromUtf8(reply->readAll()))));
+void WakaPlugin::onNetReply(QNetworkReply *reply) {
+  QTC_ASSERT(!_wakaOptions->isDebug(),
+             Core::MessageManager::write(
+                 QString("Network reply => %1")
+                     .arg(QString::fromUtf8(reply->readAll()))));
+  int status =
+      reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+  QTC_ASSERT(!_wakaOptions->isDebug(),
+             Core::MessageManager::write(
+                 QString("Network reply code => %1").arg(QString(status))));
 }
 
 void WakaPlugin::onEditorAboutToChange(Core::IEditor *editor)
