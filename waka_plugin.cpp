@@ -147,11 +147,9 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
     request.setUrl(*_req_url.get());
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QString useragent;
-    useragent = QString("%1-%2-Qt Creator wakatime Qt %3.%4.%5")
+    useragent = QString("%1-%2-Qt Creator wakatime Qt %3")
                     .arg(QSysInfo::kernelType(), QSysInfo::kernelVersion(),
-                         QString::number(QT_VERSION_MAJOR),
-                         QString::number(QT_VERSION_MINOR),
-                         QString::number(QT_VERSION_PATCH));
+                         QT_VERSION_STR);
     request.setHeader(QNetworkRequest::UserAgentHeader, useragent);
     _netManager->post(request, heartbeat_json);
 

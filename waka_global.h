@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QtGlobal>
+#ifndef QT_VERSION_STR
+#define QT_VERSION_STR "5.9.0"
+#endif
 
 #if defined(QTCREATORWAKATIME_LIBRARY)
 #  define QTCREATORWAKATIMESHARED_EXPORT Q_DECL_EXPORT
