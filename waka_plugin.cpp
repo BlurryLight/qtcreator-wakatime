@@ -146,7 +146,13 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
     request.setSslConfiguration(config);
     request.setUrl(*_req_url.get());
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setHeader(QNetworkRequest::UserAgentHeader, "Qt Creator 4.7.1 wakatime Qt 5.11.1 (Ubuntu 18.04)");
+    QString useragent;
+    useragent = QString("%1-%2-Qt Creator wakatime Qt %3.%4.%5")
+                    .arg(QSysInfo::kernelType(), QSysInfo::kernelVersion(),
+                         QString::number(QT_VERSION_MAJOR),
+                         QString::number(QT_VERSION_MINOR),
+                         QString::number(QT_VERSION_PATCH));
+    request.setHeader(QNetworkRequest::UserAgentHeader, useragent);
     _netManager->post(request, heartbeat_json);
 
     QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write(QString("Heartbeat send => %1 ").arg(QString::fromUtf8(heartbeat_json))));
