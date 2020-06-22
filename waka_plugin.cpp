@@ -104,29 +104,39 @@ ExtensionSystem::IPlugin::ShutdownFlag WakaPlugin::aboutToShutdown()
 
 void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
 {
-    thread_local QJsonObject heartbeat
-    {
-        { "entity", QString() },
-        { "entity_type", QString("file") },
-        { "category", QString("coding") },
-        { "time", 0 },
-        { "project", QString("") },
-        { "exclude", QString("") },
-        { "branch", QString("master") },
-        { "plugin", QString("QtCreator-wakatime/0.1.0") },
-        { "is_write", false },
-        { "is_debugging", false },
-        { "lineno", 1}
-    };
+  thread_local QJsonObject heartbeat{
+      {"entity", QString()},
+      {"entity_type", QString("file")},
+      {"category", QString("coding")},
+      {"time", 0},
+      {"project", QString("")},
+      {"exclude", QString("")},
+      {"branch", QString("master")},
+      {"plugin", QString("QtCreator-wakatime/0.1.0")},
+      {"is_write", false},
+      {"is_debugging", false},
+      {"lineno", 1},
+      {"language", QString("C++")}};
 
-    QTC_ASSERT(_wakaOptions->isEnabled(), QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write("Wakatime reporting explicitly disabled!")); return; );
-    QTC_ASSERT(_wakaOptions->hasKey(), Core::MessageManager::write("API key not set! Wakatime reporting disabled!"); return;);
+  QTC_ASSERT(_wakaOptions->isEnabled(),
+             QTC_ASSERT(!_wakaOptions->isDebug(),
+                        Core::MessageManager::write(
+                            "Wakatime reporting explicitly disabled!"));
+             return;);
+  QTC_ASSERT(_wakaOptions->hasKey(),
+             Core::MessageManager::write(
+                 "API key not set! Wakatime reporting disabled!");
+             return;);
 
-    qint64 curr_time = time(nullptr);
-    if(curr_time - _lastTime < _cooldownTime && !isSaving && _lastEntry == entry)
-    {
-        QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write(QString("Heartbeat NOT send dt => %1, is_write => %2").arg(curr_time - _lastTime).arg(isSaving)));
-        return;
+  qint64 curr_time = time(nullptr);
+  if (curr_time - _lastTime < _cooldownTime && !isSaving &&
+      _lastEntry == entry) {
+    QTC_ASSERT(!_wakaOptions->isDebug(),
+               Core::MessageManager::write(
+                   QString("Heartbeat NOT send dt => %1, is_write => %2")
+                       .arg(curr_time - _lastTime)
+                       .arg(isSaving)));
+    return;
     }
 
     heartbeat["entity"] = _lastEntry = entry;
