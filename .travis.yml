@@ -25,6 +25,10 @@ matrix:
           compiler: gcc
           dist: xenial
           env: QTC_VER=4.12 QTC_DL=linux_gcc_64_rhel72 QTP_OUTPUT_DIR=output QTC_SOURCE=qt-src QTC_BUILD=qt-bin
+        - os: linux
+          compiler: gcc
+          dist: xenial
+          env: QTC_VER=4.13 QTC_DL=linux_gcc_64_rhel72 QTP_OUTPUT_DIR=output QTC_SOURCE=qt-src QTC_BUILD=qt-bin
 install:
     - chmod +x scripts/install_deps.sh
     - scripts/install_deps.sh
