@@ -60,23 +60,27 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     new WakaOptionsPage(_wakaOptions, this);
 
     _netManager = new QNetworkAccessManager();
-    connect(_netManager, &QNetworkAccessManager::finished, this, &WakaPlugin::onNetReply);
-    connect(_wakaOptions.data(), &WakaOptions::apiKeyChanged, this,
-            &WakaPlugin::onApiKeyChanged);
-    connect(_wakaOptions.data(), &WakaOptions::ignorePaternChanged, this,
-            &WakaPlugin::onIgnorePaternChanged);
-    connect(_wakaOptions.data(), &WakaOptions::inStatusBarChanged, this,
-            &WakaPlugin::onInStatusBarChanged);
+    connect(_netManager, &QNetworkAccessManager::finished,
+            this, &WakaPlugin::onNetReply);
+    connect(_wakaOptions.data(), &WakaOptions::apiKeyChanged,
+            this, &WakaPlugin::onApiKeyChanged);
+    connect(_wakaOptions.data(), &WakaOptions::ignorePaternChanged,
+            this, &WakaPlugin::onIgnorePaternChanged);
+    connect(_wakaOptions.data(), &WakaOptions::inStatusBarChanged,
+            this, &WakaPlugin::onInStatusBarChanged);
 
-    connect(Core::EditorManager::instance(), &Core::EditorManager::aboutToSave, this, &WakaPlugin::onAboutToSave);
-    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorAboutToChange, this, &WakaPlugin::onEditorAboutToChange);
-    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, this, &WakaPlugin::onEditorChanged);
+    connect(Core::EditorManager::instance(), &Core::EditorManager::aboutToSave,
+            this, &WakaPlugin::onAboutToSave);
+    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorAboutToChange,
+            this, &WakaPlugin::onEditorAboutToChange);
+    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged,
+            this, &WakaPlugin::onEditorChanged);
 
     onApiKeyChanged();
     onIgnorePaternChanged();
     onInStatusBarChanged();
 
-		QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::writeDisrupting(QString("Waka plugin initialized!")));
+    QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::writeDisrupting(QString("Waka plugin initialized!")));
 
     return true;
 }
