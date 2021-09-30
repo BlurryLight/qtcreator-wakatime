@@ -76,7 +76,7 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     onIgnorePaternChanged();
     onInStatusBarChanged();
 
-    QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write(QString("Waka plugin initialized!")));
+		QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::writeDisrupting(QString("Waka plugin initialized!")));
 
     return true;
 }
@@ -97,7 +97,7 @@ ExtensionSystem::IPlugin::ShutdownFlag WakaPlugin::aboutToShutdown()
   // don't do that. Potential race condition.
   //    trySendHeartbeat(Core::EditorManager::currentDocument()->filePath().toString(),
   //    true);
-  QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write(QString(
+	QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::writeDisrupting(QString(
                                            "Plugin is going to shutdown\n")));
   return SynchronousShutdown;
 }
@@ -120,11 +120,11 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
 
   QTC_ASSERT(_wakaOptions->isEnabled(),
              QTC_ASSERT(!_wakaOptions->isDebug(),
-                        Core::MessageManager::write(
+												Core::MessageManager::writeDisrupting(
                             "Wakatime reporting explicitly disabled!"));
              return;);
   QTC_ASSERT(_wakaOptions->hasKey(),
-             Core::MessageManager::write(
+						 Core::MessageManager::writeDisrupting(
                  "API key not set! Wakatime reporting disabled!");
              return;);
 
@@ -132,7 +132,7 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
   if (curr_time - _lastTime < _cooldownTime && !isSaving &&
       _lastEntry == entry) {
     QTC_ASSERT(!_wakaOptions->isDebug(),
-               Core::MessageManager::write(
+							 Core::MessageManager::writeDisrupting(
                    QString("Heartbeat NOT send dt => %1, is_write => %2")
                        .arg(curr_time - _lastTime)
                        .arg(isSaving)));
@@ -163,7 +163,7 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
     request.setHeader(QNetworkRequest::UserAgentHeader, useragent);
     _netManager->post(request, heartbeat_json);
 
-    QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write(QString("Heartbeat send => %1 ").arg(QString::fromUtf8(heartbeat_json))));
+		QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::writeDisrupting(QString("Heartbeat send => %1 ").arg(QString::fromUtf8(heartbeat_json))));
 
     if(_wakaOptions->inStatusBar())
     {
@@ -203,13 +203,13 @@ void WakaPlugin::onInStatusBarChanged()
 
 void WakaPlugin::onNetReply(QNetworkReply *reply) {
   QTC_ASSERT(!_wakaOptions->isDebug(),
-             Core::MessageManager::write(
+						 Core::MessageManager::writeDisrupting(
                  QString("Network reply => %1")
                      .arg(QString::fromUtf8(reply->readAll()))));
   int status =
       reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
   QTC_ASSERT(!_wakaOptions->isDebug(),
-             Core::MessageManager::write(
+						 Core::MessageManager::writeDisrupting(
                  QString("Network reply code => %1").arg(QString(status))));
 }
 

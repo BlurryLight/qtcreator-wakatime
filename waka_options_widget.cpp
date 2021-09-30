@@ -15,7 +15,7 @@ WakaOptionsWidget::WakaOptionsWidget(const QSharedPointer<WakaOptions> &options,
     connect(_ui->shToolButton, &QToolButton::pressed, this, [this]()
     {
         _ui->apiKeyLineEdit->setEchoMode(_ui->apiKeyLineEdit->echoMode() == QLineEdit::EchoMode::Password ? QLineEdit::EchoMode::Normal : QLineEdit::EchoMode::Password);
-        _ui->shToolButton->setText(_ui->apiKeyLineEdit->echoMode() == QLineEdit::EchoMode::Password ? "show" : "hide");
+				_ui->shToolButton->setText(_ui->apiKeyLineEdit->echoMode() == QLineEdit::EchoMode::Password ? QString("show") : QString("hide"));
     });
 }
 
