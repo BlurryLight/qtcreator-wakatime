@@ -54,6 +54,32 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
 
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
+
+
+    //check operating system
+    int os_is = -1; // 0 = windows, 1 = linux, 2 = Macos
+#ifdef Q_OS_WINDOWS
+    int os = 0;
+#endif
+#ifdef Q_OS_LINUX
+    int os = 1;
+#endif
+#ifdef Q_OS_DARWIN
+    int os = 2;
+#endif
+    switch (os) {
+        case 0: Core::MessageManager::writeDisrupting("OS is Winodws");break;
+        case 1: Core::MessageManager::writeDisrupting("OS is Linux");break;
+        case 2: Core::MessageManager::writeDisrupting("OS is MacOS");break;
+    }
+
+    //check if has wakatime-cli in path
+    //if not then try download it based of the users operating system
+    // and store the path in a variable
+
+    //check if is latest version
+    //check if user has asked for updated version
+    //if so, then try update the version of wakatime-cli
     
     _req_url = std::make_unique<QUrl>();
     _wakaOptions.reset(new WakaOptions);
