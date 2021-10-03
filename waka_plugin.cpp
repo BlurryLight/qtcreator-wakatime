@@ -34,13 +34,51 @@ namespace Internal {
 
 WakaPlugin::WakaPlugin()
 {
-    // Create your members
+    //get architecture of OS
+    std::string arch = QSysInfo::buildCpuArchitecture().toStdString();
+
+    // dummy in case OS is unsupported
+    _os_running_on = OSInfo{OSType::UNKOWN,OSArch::AMD64};
+#ifdef Q_OS_WINDOWS
+    if(arch == "x86_64"){
+        _os_running_on = OSInfo{OSType::WINDOWS, OSArch::AMD64};
+    }else if(arch == "i386"){
+        _os_running_on = OSInfo{OSType::WINDOWS, OSArch::I386};
+    }
+#endif
+#ifdef Q_OS_LINUX
+    if(arch == "x86_64"){
+        _os_running_on = OSInfo{OSType::LINUX, OSArch::AMD64};
+    }else if(arch == "i386"){
+        _os_running_on = OSInfo{OSType::LINUX, OSArch::I386};
+    }else if(arch == "arm"){
+        _os_running_on = OSInfo{OSType::LINUX, OSArch::ARM};
+    }else if(arch == "arm64"){
+        _os_running_on = OSInfo{OSType::LINUX, OSArch::ARM64};
+    }
+#endif
+#ifdef Q_OS_DARWIN
+    if(arch == "x86_64"){
+        _os_running_on = OSInfo{OSType::MACOS, OSArch::AMD64};
+    }else if(arch == "arm64"){
+        _os_running_on = OSInfo{OSType::MACOS, OSArch::ARM64};
+    }
+#endif
 }
 
 WakaPlugin::~WakaPlugin()
 {
     // Unregister objects from the plugin manager's object pool
     // Delete members
+}
+
+QFile WakaPlugin::getWakaCLILocation(){
+    QString default_path = QDir::homePath()+"/.wakatime/wakatime-cli";
+    return default_path;
+}
+
+bool WakaPlugin::checkIfWakaCLIExist(){
+    return getWakaCLILocation().exists();
 }
 
 bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
@@ -55,26 +93,12 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
-
-    //check operating system
-    int os_is = -1; // 0 = windows, 1 = linux, 2 = Macos
-#ifdef Q_OS_WINDOWS
-    int os = 0;
-#endif
-#ifdef Q_OS_LINUX
-    int os = 1;
-#endif
-#ifdef Q_OS_DARWIN
-    int os = 2;
-#endif
-    switch (os) {
-        case 0: Core::MessageManager::writeDisrupting("OS is Winodws");break;
-        case 1: Core::MessageManager::writeDisrupting("OS is Linux");break;
-        case 2: Core::MessageManager::writeDisrupting("OS is MacOS");break;
-    }
-
     //check if has wakatime-cli in path
+    bool waka_cli_found = checkIfWakaCLIExist();
     //if not then try download it based of the users operating system
+    if(waka_cli_found==false){
+        //check if is 32bit if on linux or windows
+    }
     // and store the path in a variable
 
     //check if is latest version

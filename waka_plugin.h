@@ -5,6 +5,7 @@
 #include <extensionsystem/iplugin.h>
 
 #include <QPointer>
+#include <QFile>
 #include <memory>
 
 class QNetworkAccessManager;
@@ -22,6 +23,20 @@ namespace Internal {
 class WakaOptions;
 class WakaOptionsPage;
 
+enum OSType{
+    WINDOWS=0,LINUX,MACOS,UNKOWN
+};
+
+enum OSArch{
+    AMD64=0,ARM64,ARM,I386
+};
+
+struct OSInfo
+{
+    OSType _os;
+    OSArch _arch;
+};
+
 class WakaPlugin : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
@@ -36,6 +51,10 @@ public:
     ShutdownFlag aboutToShutdown();
 
     void trySendHeartbeat(const QString &entry, bool isSaving);
+
+private:
+    QFile getWakaCLILocation();
+    bool checkIfWakaCLIExist();
 
 private slots:
     void onEditorAboutToChange(Core::IEditor *editor);
@@ -53,6 +72,9 @@ private:
     qint64 _lastTime = 0;
     QString _lastEntry{""};
 
+    QString _location_of_cli;//location where wakatime-cli is to be stored
+    OSInfo _os_running_on;//mark the os qtcreator is running in
+
     QString _ignore_patern;
     std::unique_ptr<QUrl> _req_url;
     QPointer<QToolButton> _heartBeatButton;
@@ -63,6 +85,7 @@ private:
     const QString _urlPrefix{
         "https://wakatime.com/api/v1/users/current/heartbeats?api_key="};
 };
+
 
 } // namespace Internal
 } // namespace QtCreatorWakatime
