@@ -1,6 +1,7 @@
 #pragma once
 
 #include "waka_global.h"
+#include "cligetter.h"
 
 #include <extensionsystem/iplugin.h>
 
@@ -22,6 +23,7 @@ namespace Internal {
 
 class WakaOptions;
 class WakaOptionsPage;
+class CliGetter;
 
 enum OSType{
     WINDOWS=0,LINUX,MACOS,UNKOWN
@@ -43,6 +45,7 @@ class WakaPlugin : public ExtensionSystem::IPlugin
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "Wakatime.json")
 
 public:
+
     WakaPlugin();
     ~WakaPlugin();
 
@@ -52,8 +55,12 @@ public:
 
     void trySendHeartbeat(const QString &entry, bool isSaving);
 
-    QNetworkAccessManager *getNetworkManager(){
+    QNetworkAccessManager *getNetworkManager() const{
         return _netManager;
+    }
+
+    const OSInfo &getOsInfo() const{
+        return this->_os_running_on;
     }
 private:
     bool checkIfWakaCLIExist();
@@ -77,6 +84,8 @@ private:
 
     QString _location_of_cli;//location where wakatime-cli is to be stored
     OSInfo _os_running_on;//mark the os qtcreator is running in
+
+    CliGetter *_cliGetter;
 
     QString _ignore_patern;
     std::unique_ptr<QUrl> _req_url;

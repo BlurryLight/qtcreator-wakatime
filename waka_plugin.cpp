@@ -28,15 +28,15 @@
 #include <QJsonDocument>
 #include <QToolButton>
 #include <QTimer>
-#include <iostream>
+#include <QThread>
 
 namespace Wakatime {
 namespace Internal {
 
-WakaPlugin::WakaPlugin()
-{
+WakaPlugin::WakaPlugin(){
     //setup networkaccessmanager
     _netManager = new QNetworkAccessManager(this);
+    _cliGetter = new CliGetter(this,_netManager);
 
     //get architecture of OS
     std::string arch = QSysInfo::buildCpuArchitecture().toStdString();
@@ -85,24 +85,12 @@ bool WakaPlugin::checkIfWakaCLIExist(){
     return getWakaCLILocation().exists();
 }
 
-std::map<OSInfo,QString> getOsDownloadFilesAvailable(Wakatime::Internal::WakaPlugin *plugin){
-    //get JSON of latest release
-    //start creating request
-    auto networkManager = plugin->getNetworkManager();
-    networkManager->connect(networkManager,&QNetworkAccessManager::finished,[](QNetworkReply *reply){
-        auto data = reply->readAll().toStdString();
-        data = "Data is : "+data;
-        qDebug(data.c_str());
-    });
-    auto request = QNetworkRequest(Wakatime::Constants::WAKATIME_RELEASE_URL);
-    auto sslConfig = QSslConfiguration::defaultConfiguration();
-    sslConfig.setProtocol(QSsl::TlsV1_3);
-    request.setSslConfiguration(sslConfig);
-    networkManager->get(request);
-    //get assets json
-    //use asset json to map downloadable zips to OSInfo
-    std::map <OSInfo,QString> filesOnOSs;
-    return filesOnOSs;
+
+const QString getUrlForWakatimeCLIBaseOnOS(const OSInfo &info){
+    return "";
+}
+
+void getOsDownloadFilesAvailable(Wakatime::Internal::WakaPlugin *plugin){
 }
 
 bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
@@ -121,10 +109,14 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     bool waka_cli_found = checkIfWakaCLIExist();
     //if not then try download it based of the users operating system
     if(waka_cli_found==false){
-        // get data on latest wakatime-cli available and download file to use
-        getOsDownloadFilesAvailable(this);
-        std::cout<<"KWENDA!!!!!!!!\n";
-        //check if is 32bit if on linux or windows
+        QThread *cliDownloaderThread = new QThread(this);
+        _cliGetter->moveToThread(cliDownloaderThread);
+        connect(_cliGetter,&CliGetter::doneGettingAssetsUrl,[](QString url){
+            qDebug()<<"ADDRESS: "<<url;
+        });
+        _cliGetter->connect(cliDownloaderThread,&QThread::started,
+                            _cliGetter,&CliGetter::startGettingAssertUrl);
+        cliDownloaderThread->start();
     }else{
     }
     // and store the path in a variable

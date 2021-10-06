@@ -23,6 +23,7 @@ set(WAKA_SOURCES
 	waka_options.cpp
 	waka_options_page.cpp
 	waka_options_widget.cpp
+	cligetter.cpp
 )
 
 set(WAKA_HEADERS
@@ -32,6 +33,7 @@ set(WAKA_HEADERS
 	waka_global.h
 	waka_options_page.h
 	waka_options_widget.h
+	cligetter.h #Handle getting wakatime-cli release
 )
 
 set(WAKA_FORMS waka_options.ui)
