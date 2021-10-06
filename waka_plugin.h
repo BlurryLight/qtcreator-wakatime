@@ -52,8 +52,10 @@ public:
 
     void trySendHeartbeat(const QString &entry, bool isSaving);
 
+    QNetworkAccessManager *getNetworkManager(){
+        return _netManager;
+    }
 private:
-    QFile getWakaCLILocation();
     bool checkIfWakaCLIExist();
 
 private slots:
@@ -68,6 +70,7 @@ private slots:
 
     void onNetReply(QNetworkReply *reply);
 
+
 private:
     qint64 _lastTime = 0;
     QString _lastEntry{""};
@@ -78,7 +81,7 @@ private:
     QString _ignore_patern;
     std::unique_ptr<QUrl> _req_url;
     QPointer<QToolButton> _heartBeatButton;
-    QPointer<QNetworkAccessManager> _netManager;
+    QNetworkAccessManager *_netManager;
     QSharedPointer<WakaOptions> _wakaOptions;
 
     const int64_t _cooldownTime = 120;

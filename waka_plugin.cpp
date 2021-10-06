@@ -28,12 +28,16 @@
 #include <QJsonDocument>
 #include <QToolButton>
 #include <QTimer>
+#include <iostream>
 
 namespace Wakatime {
 namespace Internal {
 
 WakaPlugin::WakaPlugin()
 {
+    //setup networkaccessmanager
+    _netManager = new QNetworkAccessManager(this);
+
     //get architecture of OS
     std::string arch = QSysInfo::buildCpuArchitecture().toStdString();
 
@@ -72,13 +76,33 @@ WakaPlugin::~WakaPlugin()
     // Delete members
 }
 
-QFile WakaPlugin::getWakaCLILocation(){
+QFile getWakaCLILocation(){
     QString default_path = QDir::homePath()+"/.wakatime/wakatime-cli";
     return default_path;
 }
 
 bool WakaPlugin::checkIfWakaCLIExist(){
     return getWakaCLILocation().exists();
+}
+
+std::map<OSInfo,QString> getOsDownloadFilesAvailable(Wakatime::Internal::WakaPlugin *plugin){
+    //get JSON of latest release
+    //start creating request
+    auto networkManager = plugin->getNetworkManager();
+    networkManager->connect(networkManager,&QNetworkAccessManager::finished,[](QNetworkReply *reply){
+        auto data = reply->readAll().toStdString();
+        data = "Data is : "+data;
+        qDebug(data.c_str());
+    });
+    auto request = QNetworkRequest(Wakatime::Constants::WAKATIME_RELEASE_URL);
+    auto sslConfig = QSslConfiguration::defaultConfiguration();
+    sslConfig.setProtocol(QSsl::TlsV1_3);
+    request.setSslConfiguration(sslConfig);
+    networkManager->get(request);
+    //get assets json
+    //use asset json to map downloadable zips to OSInfo
+    std::map <OSInfo,QString> filesOnOSs;
+    return filesOnOSs;
 }
 
 bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
@@ -97,7 +121,11 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     bool waka_cli_found = checkIfWakaCLIExist();
     //if not then try download it based of the users operating system
     if(waka_cli_found==false){
+        // get data on latest wakatime-cli available and download file to use
+        getOsDownloadFilesAvailable(this);
+        std::cout<<"KWENDA!!!!!!!!\n";
         //check if is 32bit if on linux or windows
+    }else{
     }
     // and store the path in a variable
 
@@ -109,7 +137,6 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     _wakaOptions.reset(new WakaOptions);
     new WakaOptionsPage(_wakaOptions, this);
 
-    _netManager = new QNetworkAccessManager();
     connect(_netManager, &QNetworkAccessManager::finished,
             this, &WakaPlugin::onNetReply);
     connect(_wakaOptions.data(), &WakaOptions::apiKeyChanged,

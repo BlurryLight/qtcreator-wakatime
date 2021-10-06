@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 message(STATUS "CMAKE_PREFIX_PATH IS ${CMAKE_PREFIX_PATH}")
 
+find_package(OpenSSL COMPONENTS SSL REQUIRED)
 find_package(QtCreator COMPONENTS Core ProjectExplorer REQUIRED)
 find_package(QT NAMES Qt6 Qt5
 	COMPONENTS Core Network Widgets REQUIRED)
@@ -45,6 +46,7 @@ add_qtc_plugin(${PROJECT_NAME}
 	${QtX}::Widgets
 	QtCreator::ExtensionSystem
 	QtCreator::Utils
+	OpenSSL::SSL
 	SOURCES
 	#.github/workflows/build_cmake.yml
 	#.github/workflows/README.md
