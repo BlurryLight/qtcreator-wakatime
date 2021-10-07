@@ -19,6 +19,7 @@ public:
     const QSslConfiguration getSslConfiguration()const;
 public slots:
     void startGettingAssertUrl();
+    void startGettingZipDownloadUrl(QString url);
 signals:
     void doneGettingAssetsUrl(QString &url);
     void doneGettingZipDownloadUrl(QString &url);

@@ -9,13 +9,29 @@ namespace Internal {
 
 CliGetter::CliGetter(QObject *parent,
                      QNetworkAccessManager *networkMan)
-    :QObject(parent),_netMan(networkMan){}
+    :QObject(parent),_netMan(networkMan){
+
+    connect(this,&CliGetter::doneGettingAssetsUrl,
+            this,&CliGetter::startGettingZipDownloadUrl);
+}
 
 
 const QSslConfiguration CliGetter::getSslConfiguration()const{
     auto sslConfig = QSslConfiguration::defaultConfiguration();
     sslConfig.setProtocol(QSsl::TlsV1_3);
     return sslConfig;
+}
+
+void CliGetter::startGettingZipDownloadUrl(QString url){
+    auto req = QNetworkRequest(url);
+    req.setSslConfiguration(getSslConfiguration());
+    auto reply = _netMan->get(req);
+    reply->connect(reply,&QNetworkReply::finished,[cli=this,reply]()
+    {
+        auto jsonDoc = QJsonDocument::fromJson(reply->readAll());
+        qDebug()<<"Goten: "<<jsonDoc;
+    });
+    qDebug()<<"WE GOT HERE";
 }
 
 void CliGetter::startGettingAssertUrl(){
@@ -27,22 +43,6 @@ void CliGetter::startGettingAssertUrl(){
             auto jsonDoc = QJsonDocument::fromJson(reply->readAll());
             auto assert_url = jsonDoc["assets_url"].toString();
             emit cli->doneGettingAssetsUrl(assert_url);
-
-            //disconnect signal with this lambda
-            //networkManager->disconnect(networkManager,&QNetworkAccessManager::finished,nullptr,nullptr);
-
-            //create new connection
-            //networkManager->connect(networkManager,&QNetworkAccessManager::finished,[&plugin](QNetworkReply *reply){
-            //   if(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).isValid()){
-            //       auto jsonDoc = QJsonDocument::fromJson(reply->readAll());
-            //       qDebug()<<"GOTEN: "<<jsonDoc;
-            //   }
-            //});
-            //then get zip for download urls
-            //auto request = QNetworkRequest(jsonDoc["assets_url"].toString());
-            //request.setSslConfiguration(getSslConfiguration());
-            qDebug()<<"WE GOT HERE";
-            //networkManager->get(request);
         }else{
             //if we reach here means there was an error
             QString msg = "Sorry, couldn't connect to ";
