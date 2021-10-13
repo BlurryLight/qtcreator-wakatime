@@ -14,47 +14,45 @@ message(STATUS "CMAKE_PREFIX_PATH IS ${CMAKE_PREFIX_PATH}")
 
 find_package(OpenSSL COMPONENTS SSL REQUIRED)
 find_package(QtCreator COMPONENTS Core ProjectExplorer REQUIRED)
-find_package(QT NAMES Qt6 Qt5
-	COMPONENTS Core Network Widgets REQUIRED)
-set(QtX Qt${QT_VERSION_MAJOR})
 
 set(WAKA_SOURCES
-	waka_plugin.cpp
-	waka_options.cpp
-	waka_options_page.cpp
-	waka_options_widget.cpp
-	cligetter.cpp
+    waka_plugin.cpp
+    waka_options.cpp
+    waka_options_page.cpp
+    waka_options_widget.cpp
+    cligetter.cpp
 )
 
 set(WAKA_HEADERS
-	waka_plugin.h
-	waka_options.h
-	waka_constants.h
-	waka_global.h
-	waka_options_page.h
-	waka_options_widget.h
-	cligetter.h #Handle getting wakatime-cli release
+    waka_plugin.h
+    waka_options.h
+    waka_constants.h
+    waka_global.h
+    waka_options_page.h
+    waka_options_widget.h
+    cligetter.h #Handle getting wakatime-cli release
 )
 
-set(WAKA_FORMS waka_options.ui)
-set(WAKA_RESOURCES waka.qrc)
+set(WAKA_FORMS
+    waka_options.ui)
+set(WAKA_RESOURCES
+    waka.qrc)
 
 add_qtc_plugin(${PROJECT_NAME}
-	PLUGIN_DEPENDS
-	QtCreator::Core
-	QtCreator::TextEditor
-	QtCreator::ProjectExplorer
-	DEPENDS
-	${QtX}::Widgets
-	QtCreator::ExtensionSystem
-	QtCreator::Utils
-	OpenSSL::SSL
-	SOURCES
-	#.github/workflows/build_cmake.yml
-	#.github/workflows/README.md
-	README.md
-	${WAKA_HEADERS}
-	${WAKA_SOURCES}
-	${WAKA_FORMS}
-	${WAKA_RESOURCES}
+    PLUGIN_DEPENDS
+        QtCreator::Core
+        QtCreator::TextEditor
+        QtCreator::ProjectExplorer
+    DEPENDS
+        QtCreator::ExtensionSystem
+        QtCreator::Utils
+        OpenSSL::SSL
+    SOURCES
+        #.github/workflows/build_cmake.yml
+        #.github/workflows/README.md
+        README.md
+        ${WAKA_HEADERS}
+        ${WAKA_SOURCES}
+        ${WAKA_FORMS}
+        ${WAKA_RESOURCES}
 )
