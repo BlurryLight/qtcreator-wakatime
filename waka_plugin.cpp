@@ -230,9 +230,7 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
     request.setUrl(*_req_url.get());
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QString useragent;
-    useragent = QString("%1-%2-Qt Creator wakatime Qt %3")
-                    .arg(QSysInfo::kernelType(), QSysInfo::kernelVersion(),
-                         QT_VERSION_STR);
+    useragent = QString("%1-%2-Qt Creator wakatime Qt %3").arg(QSysInfo::kernelType(), QSysInfo::kernelVersion(), QStringLiteral(QT_VERSION_STR));
     request.setHeader(QNetworkRequest::UserAgentHeader, useragent);
     _netManager->post(request, heartbeat_json);
 
@@ -281,9 +279,7 @@ void WakaPlugin::onNetReply(QNetworkReply *reply) {
                      .arg(QString::fromUtf8(reply->readAll()))));
   int status =
       reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-  QTC_ASSERT(!_wakaOptions->isDebug(),
-						 Core::MessageManager::writeDisrupting(
-                 QString("Network reply code => %1").arg(QString(status))));
+  QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::writeDisrupting(QString("Network reply code => %1").arg(QString::number(status))));
 }
 
 void WakaPlugin::onEditorAboutToChange(Core::IEditor *editor)
