@@ -22,11 +22,12 @@ jobs:
         os: [ubuntu-18.04]
         version: [4.8]
         include:
-          - version: 4.8
-            QTC_VER: 4.8
+          - version: 4.8  
             QTC_DL: linux_gcc_64_rhel72
             
     env:
+        QTC_DL: ${{  matrix.QTC_DL }}
+        QTC_VER: ${{ matrix.version  }}
         QTP_OUTPUT_DIR: output
         QTC_SOURCE: qt-src
         QTC_BUILD: qt-bin
