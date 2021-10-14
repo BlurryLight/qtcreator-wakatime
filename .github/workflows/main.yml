@@ -42,6 +42,7 @@ jobs:
           
       - name: Install packages
         run: |
+          sudo apt-get install qt5-default 
           chmod +x scripts/install_deps.sh
           scripts/install_deps.sh
           chmod +x scripts/download_qtc.sh
