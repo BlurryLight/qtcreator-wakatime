@@ -20,10 +20,22 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04]
-        version: [4.8]
+        version: [4.8,4.9,4.10,4.11,4.12,4.13,4.14]
         include:
           - version: 4.8  
             QTC_DL: linux_gcc_64_rhel72
+          - version: 4.9 
+            QTC_DL: linux_gcc_64_rhel72
+          - version: 4.10 
+            QTC_DL: linux_gcc_64_rhel72
+          - version: 4.11  
+            QTC_DL: linux_gcc_64_rhel72
+          - version: 4.12 
+            QTC_DL: linux_gcc_64_rhel72
+          - version: 4.13
+            QTC_DL: linux_x64
+          - version: 4.14 
+            QTC_DL: linux_x64
             
     env:
         QTC_DL: ${{  matrix.QTC_DL }}
