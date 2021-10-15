@@ -11,7 +11,7 @@ else()
 	FetchContent_Declare( zlib
 		GIT_REPOSITORY https://github.com/madler/zlib.git
 		GIT_TAG v1.2.11
-		)
+	)
 
 	set(OLD_FETCHCONTENT_QUIET ${FETCHCONTENT_QUIET})
 	set(FETCHCONTENT_QUIET OFF)

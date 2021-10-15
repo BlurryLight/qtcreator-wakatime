@@ -11,6 +11,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 include(SetupZLIB)
 include(SetupOpenSSL)
 
@@ -51,7 +52,7 @@ add_qtc_plugin(${PROJECT_NAME}
 	${QtX}::Widgets
 	QtCreator::ExtensionSystem
 	QtCreator::Utils
-	OpenSSL::SSL
+	LibreSSL::SSL
 	SOURCES
 	#.github/workflows/build_cmake.yml
 	#.github/workflows/README.md
