@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # Remove when sharing with others.
-list(APPEND CMAKE_PREFIX_PATH "/Path/to/Qtcreator/Build/Dir")
+#list(APPEND CMAKE_PREFIX_PATH "/Path/to/Qtcreator/Build/Dir")
 
 project(Wakatime)
 
@@ -10,9 +10,12 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(SetupZLIB)
+include(SetupOpenSSL)
+
 message(STATUS "CMAKE_PREFIX_PATH IS ${CMAKE_PREFIX_PATH}")
 
-find_package(OpenSSL COMPONENTS SSL REQUIRED)
 find_package(QtCreator COMPONENTS Core ProjectExplorer REQUIRED)
 find_package(QT NAMES Qt6 Qt5
 	COMPONENTS Core Network Widgets REQUIRED)
