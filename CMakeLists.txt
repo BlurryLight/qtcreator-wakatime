@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.16)
 
+# for setting the vcpkg path to be used
+set(CMAKE_TOOLCHAIN_FILE $ENV{CMAKE_TOOLCHAIN_FILE})
+#for stopping qtcreator using it's on vcpkg setup
+set(QT_CREATOR_SKIP_VCPKG_SETUP ON)
+
 # Remove when sharing with others.
-list(APPEND CMAKE_PREFIX_PATH "/Path/to/Qtcreator/Build/Dir")
+#list(APPEND CMAKE_PREFIX_PATH "/Path/to/Qtcreator/Build/Dir")
 
 project(Wakatime)
 
@@ -10,9 +15,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 
-message(STATUS "CMAKE_PREFIX_PATH IS ${CMAKE_PREFIX_PATH}")
+find_package(OpenSSL REQUIRED)
+find_package(ZLIB REQUIRED)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-find_package(OpenSSL COMPONENTS SSL REQUIRED)
 find_package(QtCreator COMPONENTS Core ProjectExplorer REQUIRED)
 
 set(WAKA_SOURCES
@@ -47,6 +53,8 @@ add_qtc_plugin(${PROJECT_NAME}
         QtCreator::ExtensionSystem
         QtCreator::Utils
         OpenSSL::SSL
+        OpenSSL::Crypto
+	      ZLIB::ZLIB
     SOURCES
         #.github/workflows/build_cmake.yml
         #.github/workflows/README.md
@@ -55,4 +63,5 @@ add_qtc_plugin(${PROJECT_NAME}
         ${WAKA_SOURCES}
         ${WAKA_FORMS}
         ${WAKA_RESOURCES}
+
 )
