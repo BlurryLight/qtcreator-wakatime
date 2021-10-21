@@ -1,3 +1,5 @@
+# <u>WARNING: PORTING TO CMAKE AND USE [WAKATIME-CLI](https://github.com/wakatime/wakatime-cli)</u>
+
 # Fork
 
 [![Build Status](https://travis-ci.org/BlurryLight/qtcreator-wakatime.svg?branch=master)](https://travis-ci.org/BlurryLight/qtcreator-wakatime)
