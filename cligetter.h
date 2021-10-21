@@ -13,8 +13,9 @@ class CliGetter: public QObject
     Q_OBJECT
 
     QNetworkAccessManager *_netMan;
+    QSslConfiguration _sslConfig;
 public:
-    CliGetter(QObject *parent, QNetworkAccessManager *networkManager);
+    CliGetter();
 
     const QSslConfiguration getSslConfiguration()const;
 public slots:

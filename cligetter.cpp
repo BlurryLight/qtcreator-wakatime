@@ -7,26 +7,21 @@
 namespace Wakatime {
 namespace Internal {
 
-CliGetter::CliGetter(QObject *parent,
-                     QNetworkAccessManager *networkMan)
-    :QObject(parent),_netMan(networkMan){
+CliGetter::CliGetter()
+    {
+    _netMan =  new QNetworkAccessManager(this);
+    qDebug()<<"SSL support"<<QSslSocket::supportsSsl();
+    _sslConfig = QSslConfiguration::defaultConfiguration();
+    _sslConfig.setProtocol(QSsl::TlsV1_3);
 
     connect(this,&CliGetter::doneGettingAssetsUrl,
             this,&CliGetter::startGettingZipDownloadUrl);
 }
 
 
-const QSslConfiguration CliGetter::getSslConfiguration()const{
-    qDebug()<<"SSL support"<<QSslSocket::supportsSsl();
-    qDebug()<<"SSL Build version"<<QSslSocket::sslLibraryBuildVersionString();
-    auto sslConfig = QSslConfiguration::defaultConfiguration();
-    sslConfig.setProtocol(QSsl::TlsV1_3);
-    return sslConfig;
-}
-
 void CliGetter::startGettingZipDownloadUrl(QString url){
     auto req = QNetworkRequest(url);
-    req.setSslConfiguration(getSslConfiguration());
+    req.setSslConfiguration(_sslConfig);
     auto reply = _netMan->get(req);
     reply->connect(reply,&QNetworkReply::finished,[cli=this,reply]()
     {
@@ -38,7 +33,7 @@ void CliGetter::startGettingZipDownloadUrl(QString url){
 
 void CliGetter::startGettingAssertUrl(){
     auto request = QNetworkRequest(Wakatime::Constants::WAKATIME_RELEASE_URL);
-    request.setSslConfiguration(getSslConfiguration());
+    request.setSslConfiguration(_sslConfig);
     auto reply = _netMan->get(request);
     connect(reply,&QNetworkReply::finished,[cli=this,reply](){
         if(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).isValid()){
