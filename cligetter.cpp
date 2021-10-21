@@ -7,8 +7,7 @@
 namespace Wakatime {
 namespace Internal {
 
-CliGetter::CliGetter()
-    {
+CliGetter::CliGetter(){
     _netMan =  new QNetworkAccessManager(this);
     qDebug()<<"SSL support"<<QSslSocket::supportsSsl();
     _sslConfig = QSslConfiguration::defaultConfiguration();

@@ -105,15 +105,13 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
+    QThread *cliDownloaderThread = new QThread(this);
+    _cliGetter->moveToThread(cliDownloaderThread);
+
     //check if has wakatime-cli in path
     bool waka_cli_found = checkIfWakaCLIExist();
     //if not then try download it based of the users operating system
     if(waka_cli_found==false){
-        QThread *cliDownloaderThread = new QThread(this);
-        _cliGetter->moveToThread(cliDownloaderThread);
-        connect(_cliGetter,&CliGetter::doneGettingAssetsUrl,[](QString url){
-            qDebug()<<"ADDRESS: "<<url;
-        });
         _cliGetter->connect(cliDownloaderThread,&QThread::started,
                             _cliGetter,&CliGetter::startGettingAssertUrl);
         cliDownloaderThread->start();
