@@ -212,7 +212,8 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
 
     heartbeat["entity"] = _lastEntry = entry;
     heartbeat["time"] = _lastTime = curr_time;
-    heartbeat["project"] = ProjectExplorer::ProjectTree::currentProject()->displayName();
+    if (const auto &project = ProjectExplorer::ProjectTree::currentProject())
+        heartbeat["project"] = project->displayName();
     heartbeat["is_write"] = isSaving;
     heartbeat["is_debugging"] = _wakaOptions->isDebug();
     heartbeat["exclude"] = _ignore_patern;
