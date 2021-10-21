@@ -17,6 +17,8 @@ CliGetter::CliGetter(QObject *parent,
 
 
 const QSslConfiguration CliGetter::getSslConfiguration()const{
+    qDebug()<<"SSL support"<<QSslSocket::supportsSsl();
+    qDebug()<<"SSL Build version"<<QSslSocket::sslLibraryBuildVersionString();
     auto sslConfig = QSslConfiguration::defaultConfiguration();
     sslConfig.setProtocol(QSsl::TlsV1_3);
     return sslConfig;

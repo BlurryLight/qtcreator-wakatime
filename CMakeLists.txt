@@ -15,6 +15,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 
+# use static openssl
+set(OPENSSL_USE_STATIC_LIBS ON)
 find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -49,12 +51,11 @@ add_qtc_plugin(${PROJECT_NAME}
         QtCreator::Core
         QtCreator::TextEditor
         QtCreator::ProjectExplorer
-    DEPENDS
+	DEPENDS
         QtCreator::ExtensionSystem
         QtCreator::Utils
-        OpenSSL::SSL
-        OpenSSL::Crypto
-	      ZLIB::ZLIB
+		OpenSSL::SSL
+		ZLIB::ZLIB
     SOURCES
         #.github/workflows/build_cmake.yml
         #.github/workflows/README.md
@@ -63,5 +64,4 @@ add_qtc_plugin(${PROJECT_NAME}
         ${WAKA_SOURCES}
         ${WAKA_FORMS}
         ${WAKA_RESOURCES}
-
 )
