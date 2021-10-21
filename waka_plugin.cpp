@@ -36,7 +36,6 @@ namespace Internal {
 WakaPlugin::WakaPlugin(){
     //setup networkaccessmanager
     _netManager = new QNetworkAccessManager(this);
-    _cliGetter = new CliGetter();
 
     //get architecture of OS
     std::string arch = QSysInfo::buildCpuArchitecture().toStdString();
@@ -68,6 +67,7 @@ WakaPlugin::WakaPlugin(){
         _os_running_on = OSInfo{OSType::MACOS, OSArch::ARM64};
     }
 #endif
+    _cliGetter = new CliGetter(_os_running_on);
 }
 
 WakaPlugin::~WakaPlugin()

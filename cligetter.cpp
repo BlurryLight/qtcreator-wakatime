@@ -1,4 +1,5 @@
 #include "cligetter.h"
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QNetworkReply>
 #include <coreplugin/coreplugin.h>
@@ -7,7 +8,7 @@
 namespace Wakatime {
 namespace Internal {
 
-CliGetter::CliGetter(){
+CliGetter::CliGetter(const OSInfo &_info):_osInfo(_info){
     _netMan =  new QNetworkAccessManager(this);
     qDebug()<<"SSL support"<<QSslSocket::supportsSsl();
     _sslConfig = QSslConfiguration::defaultConfiguration();
@@ -15,6 +16,12 @@ CliGetter::CliGetter(){
 
     connect(this,&CliGetter::doneGettingAssetsUrl,
             this,&CliGetter::startGettingZipDownloadUrl);
+    connect(this,&CliGetter::doneGettingZipDownloadUrl,
+            this,&CliGetter::startDownloadingZip);
+}
+
+void CliGetter::startDownloadingZip(QString url){
+    qDebug()<<"URL_DOWNLOAD: "<<url;
 }
 
 
@@ -25,9 +32,55 @@ void CliGetter::startGettingZipDownloadUrl(QString url){
     reply->connect(reply,&QNetworkReply::finished,[cli=this,reply]()
     {
         auto jsonDoc = QJsonDocument::fromJson(reply->readAll());
-        qDebug()<<"Goten: "<<jsonDoc;
+        //parse all download links for one that match OSInfo object
+        QJsonArray arr=jsonDoc.array();
+        for(const QJsonValue &val:arr){
+            QString downloadUrl = val["browser_download_url"].toString();
+            //check os
+            if(cli->_osInfo._os==OSType::WINDOWS){
+                //only has 64bit and 32bit
+                if(cli->_osInfo._arch==OSArch::AMD64){
+                    if(downloadUrl.contains("windows-amd64")){
+                        emit cli->doneGettingZipDownloadUrl(downloadUrl);
+                    }
+                }else if(cli->_osInfo._arch==OSArch::I386){
+                    if(downloadUrl.contains("windows-386")){
+                        emit cli->doneGettingZipDownloadUrl(downloadUrl);
+                    }
+                }
+            }else if(cli->_osInfo._os==OSType::LINUX){
+                // only has amd64, arm64, i386, and arm
+                if(cli->_osInfo._arch==OSArch::AMD64){
+                    if(downloadUrl.contains("linux-amd64")){
+                        emit cli->doneGettingZipDownloadUrl(downloadUrl);
+                    }
+                }else if(cli->_osInfo._arch==OSArch::ARM64){
+                    if(downloadUrl.contains("linux-arm64")){
+                        emit cli->doneGettingZipDownloadUrl(downloadUrl);
+                    }
+                }else if(cli->_osInfo._arch==OSArch::ARM){
+                    if(downloadUrl.contains("linux-arm")){
+                        emit cli->doneGettingZipDownloadUrl(downloadUrl);
+                    }
+                }else if(cli->_osInfo._arch==OSArch::I386){
+                    if(downloadUrl.contains("linux-386")){
+                        emit cli->doneGettingZipDownloadUrl(downloadUrl);
+                    }
+                }
+            }else if(cli->_osInfo._os==OSType::MACOS){
+                //only has amd64 and arm64
+                if(cli->_osInfo._arch==OSArch::AMD64){
+                    if(downloadUrl.contains("darwin-amd64")){
+                        emit cli->doneGettingZipDownloadUrl(downloadUrl);
+                    }
+                }else if(cli->_osInfo._arch==OSArch::ARM64){
+                    if(downloadUrl.contains("darwin-arm64")){
+                        emit cli->doneGettingZipDownloadUrl(downloadUrl);
+                    }
+                }
+            }
+        }
     });
-    qDebug()<<"WE GOT HERE";
 }
 
 void CliGetter::startGettingAssertUrl(){

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "waka_global.h"
+#include "waka_constants.h"
 #include "cligetter.h"
 
 #include <extensionsystem/iplugin.h>
@@ -25,19 +26,8 @@ class WakaOptions;
 class WakaOptionsPage;
 class CliGetter;
 
-enum OSType{
-    WINDOWS=0,LINUX,MACOS,UNKOWN
-};
-
-enum OSArch{
-    AMD64=0,ARM64,ARM,I386
-};
-
-struct OSInfo
-{
-    OSType _os;
-    OSArch _arch;
-};
+// For using OSInfo
+using namespace Wakatime::Constants;
 
 class WakaPlugin : public ExtensionSystem::IPlugin
 {
