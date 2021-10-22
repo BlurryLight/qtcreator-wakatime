@@ -23,6 +23,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(QtCreator COMPONENTS Core ProjectExplorer REQUIRED)
 
+
 set(WAKA_SOURCES
     waka_plugin.cpp
     waka_options.cpp
@@ -65,3 +66,8 @@ add_qtc_plugin(${PROJECT_NAME}
         ${WAKA_FORMS}
         ${WAKA_RESOURCES}
 )
+
+# set the definition for the version, important for breaking changes in 4.14 between 5.0
+string(COMPARE LESS ${IDE_QT_VERSION_MIN} "5.15.0" IDE_LESS_15_VERSION)
+target_compile_definitions(${PROJECT_NAME} PUBLIC IDE_LESS_15_VERSION=${IDE_LESS_15_VERSION})
+message(STATUS "QTCREATOR_VERSION: ${IDE_LESS_15_VERSION}")

@@ -3,6 +3,8 @@
 #include "waka_options.h"
 #include "waka_options_page.h"
 
+#include <cstring>
+
 #include <coreplugin/icore.h>
 #include <coreplugin/icontext.h>
 #include <coreplugin/actionmanager/actionmanager.h>
@@ -34,6 +36,52 @@ namespace Wakatime {
 namespace Internal {
 
 WakaPlugin::WakaPlugin(){
+}
+
+WakaPlugin::~WakaPlugin()
+{
+    // Unregister objects from the plugin manager's object pool
+    // Delete members
+}
+
+void WakaPlugin::ShowMessagePrompt(const QString str){
+
+#if IDE_LESS_15_VERSION==1
+   Core::MessageManager::write(str);
+#else
+   Core::MessageManager::writeDisrupting(QString(str);
+#endif
+}
+
+QFile getWakaCLILocation(){
+    QString default_path = QDir::homePath()+"/.wakatime/wakatime-cli";
+    return default_path;
+}
+
+bool WakaPlugin::checkIfWakaCLIExist(){
+    return getWakaCLILocation().exists();
+}
+
+
+const QString getUrlForWakatimeCLIBaseOnOS(const OSInfo &info){
+    return "";
+}
+
+void getOsDownloadFilesAvailable(Wakatime::Internal::WakaPlugin *plugin){
+}
+
+bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
+{
+    // Register objects in the plugin manager's object pool
+    // Load settings
+    // Add actions to menus
+    // Connect to other plugins' signals
+    // In the initialize function, a plugin can be sure that the plugins it
+    // depends on have initialized their members.
+
+    Q_UNUSED(arguments)
+    Q_UNUSED(errorString)
+
     //setup networkaccessmanager
     _netManager = new QNetworkAccessManager(this);
 
@@ -68,42 +116,6 @@ WakaPlugin::WakaPlugin(){
     }
 #endif
     _cliGetter = new CliGetter(_os_running_on);
-}
-
-WakaPlugin::~WakaPlugin()
-{
-    // Unregister objects from the plugin manager's object pool
-    // Delete members
-}
-
-QFile getWakaCLILocation(){
-    QString default_path = QDir::homePath()+"/.wakatime/wakatime-cli";
-    return default_path;
-}
-
-bool WakaPlugin::checkIfWakaCLIExist(){
-    return getWakaCLILocation().exists();
-}
-
-
-const QString getUrlForWakatimeCLIBaseOnOS(const OSInfo &info){
-    return "";
-}
-
-void getOsDownloadFilesAvailable(Wakatime::Internal::WakaPlugin *plugin){
-}
-
-bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
-{
-    // Register objects in the plugin manager's object pool
-    // Load settings
-    // Add actions to menus
-    // Connect to other plugins' signals
-    // In the initialize function, a plugin can be sure that the plugins it
-    // depends on have initialized their members.
-
-    Q_UNUSED(arguments)
-    Q_UNUSED(errorString)
 
     QThread *cliDownloaderThread = new QThread(this);
     _cliGetter->moveToThread(cliDownloaderThread);
@@ -114,6 +126,7 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     if(waka_cli_found==false){
         _cliGetter->connect(cliDownloaderThread,&QThread::started,
                             _cliGetter,&CliGetter::startGettingAssertUrl);
+        connect(_cliGetter,&CliGetter::promptMessage,this,&ShowMessagePrompt);
         cliDownloaderThread->start();
     }else{
     }
@@ -147,8 +160,7 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     onIgnorePaternChanged();
     onInStatusBarChanged();
 
-    QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::writeDisrupting(QString("Waka plugin initialized!")));
-
+    QTC_ASSERT(!_wakaOptions->isDebug(),ShowMessagePrompt("Waka plugin initialized!"));
     return true;
 }
 
@@ -168,8 +180,8 @@ ExtensionSystem::IPlugin::ShutdownFlag WakaPlugin::aboutToShutdown()
   // don't do that. Potential race condition.
   //    trySendHeartbeat(Core::EditorManager::currentDocument()->filePath().toString(),
   //    true);
-	QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::writeDisrupting(QString(
-                                           "Plugin is going to shutdown\n")));
+    QTC_ASSERT(!_wakaOptions->isDebug(),
+               ShowMessagePrompt( "Plugin is going to shutdown\n"));
   return SynchronousShutdown;
 }
 
@@ -191,20 +203,16 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
 
   QTC_ASSERT(_wakaOptions->isEnabled(),
              QTC_ASSERT(!_wakaOptions->isDebug(),
-												Core::MessageManager::writeDisrupting(
-                            "Wakatime reporting explicitly disabled!"));
+                        ShowMessagePrompt("Wakatime reporting explicitly disabled!"));
              return;);
   QTC_ASSERT(_wakaOptions->hasKey(),
-						 Core::MessageManager::writeDisrupting(
-                 "API key not set! Wakatime reporting disabled!");
-             return;);
+                         ShowMessagePrompt("API key not set! Wakatime reporting disabled!"));
 
   qint64 curr_time = time(nullptr);
   if (curr_time - _lastTime < _cooldownTime && !isSaving &&
       _lastEntry == entry) {
     QTC_ASSERT(!_wakaOptions->isDebug(),
-							 Core::MessageManager::writeDisrupting(
-                   QString("Heartbeat NOT send dt => %1, is_write => %2")
+                             ShowMessagePrompt(QString("Heartbeat NOT send dt => %1, is_write => %2")
                        .arg(curr_time - _lastTime)
                        .arg(isSaving)));
     return;
@@ -233,7 +241,8 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
     request.setHeader(QNetworkRequest::UserAgentHeader, useragent);
     _netManager->post(request, heartbeat_json);
 
-		QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::writeDisrupting(QString("Heartbeat send => %1 ").arg(QString::fromUtf8(heartbeat_json))));
+        QTC_ASSERT(!_wakaOptions->isDebug(),
+                   ShowMessagePrompt(QString("Heartbeat send => %1 ").arg(QString::fromUtf8(heartbeat_json))));
 
     if(_wakaOptions->inStatusBar())
     {
@@ -273,12 +282,11 @@ void WakaPlugin::onInStatusBarChanged()
 
 void WakaPlugin::onNetReply(QNetworkReply *reply) {
   QTC_ASSERT(!_wakaOptions->isDebug(),
-						 Core::MessageManager::writeDisrupting(
-                 QString("Network reply => %1")
+                         ShowMessagePrompt(QString("Network reply => %1")
                      .arg(QString::fromUtf8(reply->readAll()))));
   int status =
       reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-  QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::writeDisrupting(QString("Network reply code => %1").arg(QString::number(status))));
+  QTC_ASSERT(!_wakaOptions->isDebug(), ShowMessagePrompt(QString("Network reply code => %1").arg(QString::number(status))));
 }
 
 void WakaPlugin::onEditorAboutToChange(Core::IEditor *editor)

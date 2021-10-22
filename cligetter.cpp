@@ -4,13 +4,13 @@
 #include <QNetworkReply>
 #include <coreplugin/coreplugin.h>
 #include <coreplugin/messagemanager.h>
+#include <waka_plugin.h>
 
 namespace Wakatime {
 namespace Internal {
 
 CliGetter::CliGetter(const OSInfo &_info):_osInfo(_info){
     _netMan =  new QNetworkAccessManager(this);
-    qDebug()<<"SSL support"<<QSslSocket::supportsSsl();
     _sslConfig = QSslConfiguration::defaultConfiguration();
     _sslConfig.setProtocol(QSsl::TlsV1_3);
 
@@ -21,7 +21,8 @@ CliGetter::CliGetter(const OSInfo &_info):_osInfo(_info){
 }
 
 void CliGetter::startDownloadingZip(QString url){
-    qDebug()<<"URL_DOWNLOAD: "<<url;
+    QString msg = "URL_DOWNLOAD: "+url;
+    emit promptMessage(msg);
 }
 
 
@@ -84,6 +85,8 @@ void CliGetter::startGettingZipDownloadUrl(QString url){
 }
 
 void CliGetter::startGettingAssertUrl(){
+    QSslSocket::supportsSsl()?emit promptMessage("SSL support exists"):
+                              emit promptMessage("SSL support not exists");
     auto request = QNetworkRequest(Wakatime::Constants::WAKATIME_RELEASE_URL);
     request.setSslConfiguration(_sslConfig);
     auto reply = _netMan->get(request);
@@ -96,7 +99,7 @@ void CliGetter::startGettingAssertUrl(){
             //if we reach here means there was an error
             QString msg = "Sorry, couldn't connect to ";
             msg += reply->url().toString();
-            Core::MessageManager::writeDisrupting(msg);
+            WakaPlugin::ShowMessagePrompt(msg);
         }
     });
 }

@@ -38,6 +38,7 @@ public:
 
     WakaPlugin();
     ~WakaPlugin();
+    static void ShowMessagePrompt(const QString str);
 
     bool initialize(const QStringList &arguments, QString *errorString);
     void extensionsInitialized();

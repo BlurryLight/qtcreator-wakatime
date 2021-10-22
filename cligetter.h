@@ -29,6 +29,7 @@ public slots:
 signals:
     void doneGettingAssetsUrl(QString &url);
     void doneGettingZipDownloadUrl(QString &url);
+    void promptMessage(QString url);
 };
 
 } // namespace Internal
