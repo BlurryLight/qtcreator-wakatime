@@ -5,11 +5,12 @@
 #include <coreplugin/coreplugin.h>
 #include <coreplugin/messagemanager.h>
 #include <waka_plugin.h>
+#include <QDir>
 
 namespace Wakatime {
 namespace Internal {
 
-CliGetter::CliGetter(const OSInfo &_info):_osInfo(_info){
+CliGetter::CliGetter(){
     _netMan =  new QNetworkAccessManager(this);
     _sslConfig = QSslConfiguration::defaultConfiguration();
     _sslConfig.setProtocol(QSsl::TlsV1_3);
@@ -18,10 +19,39 @@ CliGetter::CliGetter(const OSInfo &_info):_osInfo(_info){
             this,&CliGetter::startGettingZipDownloadUrl);
     connect(this,&CliGetter::doneGettingZipDownloadUrl,
             this,&CliGetter::startDownloadingZip);
+    connect(this,&CliGetter::doneDownloadingZip,
+            this,&CliGetter::startUnzipping);
+}
+
+void CliGetter::startUnzipping(QString location){
+    QString fileExists("File exists @: ");
+    if(QFile(location).exists()){
+        fileExists+=location;
+        emit promptMessage(fileExists);
+    }
 }
 
 void CliGetter::startDownloadingZip(QString url){
-    QString msg = "URL_DOWNLOAD: "+url;
+    QString msg = "WAKATIME URL_DOWNLOAD: "+url;
+    QString random_number=QString::fromStdString(std::to_string(rand()));
+    QString tempDir = QDir::tempPath();
+    QString wakatime_cli_zip = tempDir+QDir::separator()+"/wakatime-cli"+random_number+".zip";
+
+    auto req = QNetworkRequest(url);
+    req.setSslConfiguration(_sslConfig);
+    req.setAttribute(QNetworkRequest::FollowRedirectsAttribute,true);
+    auto reply = _netMan->get(req);
+
+    reply->connect(reply,&QNetworkReply::finished,[cli=this,wakatime_cli_zip,reply](){
+        QFile wakafile(wakatime_cli_zip);
+        if(wakafile.open(QFile::WriteOnly)){
+            wakafile.write(reply->readAll());
+            wakafile.flush();
+            wakafile.close();
+
+            emit cli->doneDownloadingZip(wakatime_cli_zip);
+        }
+    });
     emit promptMessage(msg);
 }
 
@@ -85,8 +115,36 @@ void CliGetter::startGettingZipDownloadUrl(QString url){
 }
 
 void CliGetter::startGettingAssertUrl(){
-    QSslSocket::supportsSsl()?emit promptMessage("SSL support exists"):
-                              emit promptMessage("SSL support not exists");
+    // dummy in case OS is unsupported
+    _osInfo = OSInfo{OSType::UNKOWN,OSArch::AMD64};
+    //get architecture of OS
+    std::string arch = QSysInfo::buildCpuArchitecture().toStdString();
+#ifdef Q_OS_WINDOWS
+    if(arch == "x86_64"){
+        _osInfo = OSInfo{OSType::WINDOWS, OSArch::AMD64};
+    }else if(arch == "i386"){
+        _osInfo = OSInfo{OSType::WINDOWS, OSArch::I386};
+    }
+#endif
+#ifdef Q_OS_LINUX
+    if(arch == "x86_64"){
+        _osInfo = OSInfo{OSType::LINUX, OSArch::AMD64};
+    }else if(arch == "i386"){
+        _osInfo = OSInfo{OSType::LINUX, OSArch::I386};
+    }else if(arch == "arm"){
+        _osInfo = OSInfo{OSType::LINUX, OSArch::ARM};
+    }else if(arch == "arm64"){
+        _osInfo = OSInfo{OSType::LINUX, OSArch::ARM64};
+    }
+#endif
+#ifdef Q_OS_DARWIN
+    if(arch == "x86_64"){
+        _osInfo = OSInfo{OSType::MACOS, OSArch::AMD64};
+    }else if(arch == "arm64"){
+        _osInfo = OSInfo{OSType::MACOS, OSArch::ARM64};
+    }
+#endif
+
     auto request = QNetworkRequest(Wakatime::Constants::WAKATIME_RELEASE_URL);
     request.setSslConfiguration(_sslConfig);
     auto reply = _netMan->get(request);
@@ -102,6 +160,8 @@ void CliGetter::startGettingAssertUrl(){
             WakaPlugin::ShowMessagePrompt(msg);
         }
     });
+    QSslSocket::supportsSsl()?emit promptMessage("SSL support exists"):
+                              emit promptMessage("SSL support not exists");return;
 }
 
 } // namespace Internal

@@ -35,8 +35,7 @@
 namespace Wakatime {
 namespace Internal {
 
-WakaPlugin::WakaPlugin(){
-}
+WakaPlugin::WakaPlugin(){}
 
 WakaPlugin::~WakaPlugin()
 {
@@ -62,14 +61,6 @@ bool WakaPlugin::checkIfWakaCLIExist(){
     return getWakaCLILocation().exists();
 }
 
-
-const QString getUrlForWakatimeCLIBaseOnOS(const OSInfo &info){
-    return "";
-}
-
-void getOsDownloadFilesAvailable(Wakatime::Internal::WakaPlugin *plugin){
-}
-
 bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
 {
     // Register objects in the plugin manager's object pool
@@ -85,50 +76,19 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     //setup networkaccessmanager
     _netManager = new QNetworkAccessManager(this);
 
-    //get architecture of OS
-    std::string arch = QSysInfo::buildCpuArchitecture().toStdString();
+    _cliGetter = new CliGetter();
 
-    // dummy in case OS is unsupported
-    _os_running_on = OSInfo{OSType::UNKOWN,OSArch::AMD64};
-#ifdef Q_OS_WINDOWS
-    if(arch == "x86_64"){
-        _os_running_on = OSInfo{OSType::WINDOWS, OSArch::AMD64};
-    }else if(arch == "i386"){
-        _os_running_on = OSInfo{OSType::WINDOWS, OSArch::I386};
-    }
-#endif
-#ifdef Q_OS_LINUX
-    if(arch == "x86_64"){
-        _os_running_on = OSInfo{OSType::LINUX, OSArch::AMD64};
-    }else if(arch == "i386"){
-        _os_running_on = OSInfo{OSType::LINUX, OSArch::I386};
-    }else if(arch == "arm"){
-        _os_running_on = OSInfo{OSType::LINUX, OSArch::ARM};
-    }else if(arch == "arm64"){
-        _os_running_on = OSInfo{OSType::LINUX, OSArch::ARM64};
-    }
-#endif
-#ifdef Q_OS_DARWIN
-    if(arch == "x86_64"){
-        _os_running_on = OSInfo{OSType::MACOS, OSArch::AMD64};
-    }else if(arch == "arm64"){
-        _os_running_on = OSInfo{OSType::MACOS, OSArch::ARM64};
-    }
-#endif
-    _cliGetter = new CliGetter(_os_running_on);
-
-    QThread *cliDownloaderThread = new QThread(this);
-    _cliGetter->moveToThread(cliDownloaderThread);
+    _cliGettingThread = new QThread(this);
+    _cliGetter->moveToThread(_cliGettingThread);
 
     //check if has wakatime-cli in path
     bool waka_cli_found = checkIfWakaCLIExist();
     //if not then try download it based of the users operating system
     if(waka_cli_found==false){
-        _cliGetter->connect(cliDownloaderThread,&QThread::started,
+        _cliGetter->connect(_cliGettingThread,&QThread::started,
                             _cliGetter,&CliGetter::startGettingAssertUrl);
         connect(_cliGetter,&CliGetter::promptMessage,this,&ShowMessagePrompt);
-        cliDownloaderThread->start();
-    }else{
+        _cliGettingThread->start();
     }
     // and store the path in a variable
 
@@ -136,31 +96,31 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     //check if user has asked for updated version
     //if so, then try update the version of wakatime-cli
     
-    _req_url = std::make_unique<QUrl>();
-    _wakaOptions.reset(new WakaOptions);
-    new WakaOptionsPage(_wakaOptions, this);
+    //_req_url = std::make_unique<QUrl>();
+    //_wakaOptions.reset(new WakaOptions);
+    //new WakaOptionsPage(_wakaOptions, this);
 
-    connect(_netManager, &QNetworkAccessManager::finished,
-            this, &WakaPlugin::onNetReply);
-    connect(_wakaOptions.data(), &WakaOptions::apiKeyChanged,
-            this, &WakaPlugin::onApiKeyChanged);
-    connect(_wakaOptions.data(), &WakaOptions::ignorePaternChanged,
-            this, &WakaPlugin::onIgnorePaternChanged);
-    connect(_wakaOptions.data(), &WakaOptions::inStatusBarChanged,
-            this, &WakaPlugin::onInStatusBarChanged);
+    //connect(_netManager, &QNetworkAccessManager::finished,
+    //        this, &WakaPlugin::onNetReply);
+    //connect(_wakaOptions.data(), &WakaOptions::apiKeyChanged,
+    //        this, &WakaPlugin::onApiKeyChanged);
+    //connect(_wakaOptions.data(), &WakaOptions::ignorePaternChanged,
+    //        this, &WakaPlugin::onIgnorePaternChanged);
+    //connect(_wakaOptions.data(), &WakaOptions::inStatusBarChanged,
+    //        this, &WakaPlugin::onInStatusBarChanged);
 
-    connect(Core::EditorManager::instance(), &Core::EditorManager::aboutToSave,
-            this, &WakaPlugin::onAboutToSave);
-    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorAboutToChange,
-            this, &WakaPlugin::onEditorAboutToChange);
-    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged,
-            this, &WakaPlugin::onEditorChanged);
+    //connect(Core::EditorManager::instance(), &Core::EditorManager::aboutToSave,
+    //        this, &WakaPlugin::onAboutToSave);
+    //connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorAboutToChange,
+    //        this, &WakaPlugin::onEditorAboutToChange);
+    //connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged,
+    //        this, &WakaPlugin::onEditorChanged);
 
-    onApiKeyChanged();
-    onIgnorePaternChanged();
-    onInStatusBarChanged();
+    //onApiKeyChanged();
+    //onIgnorePaternChanged();
+    //onInStatusBarChanged();
 
-    QTC_ASSERT(!_wakaOptions->isDebug(),ShowMessagePrompt("Waka plugin initialized!"));
+    //QTC_ASSERT(!_wakaOptions->isDebug(),ShowMessagePrompt("Waka plugin initialized!"));
     return true;
 }
 

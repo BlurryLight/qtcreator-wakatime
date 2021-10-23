@@ -79,6 +79,7 @@ private:
     CliGetter *_cliGetter;
 
     QString _ignore_patern;
+    QThread *_cliGettingThread;
     std::unique_ptr<QUrl> _req_url;
     QPointer<QToolButton> _heartBeatButton;
     QNetworkAccessManager *_netManager;

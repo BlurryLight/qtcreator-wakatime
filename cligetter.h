@@ -19,16 +19,18 @@ class CliGetter: public QObject
     QSslConfiguration _sslConfig;
     OSInfo _osInfo;
 public:
-    CliGetter(const OSInfo &info);
+    CliGetter();
 
     const QSslConfiguration getSslConfiguration()const;
 public slots:
     void startGettingAssertUrl();
     void startGettingZipDownloadUrl(QString url);
     void startDownloadingZip(QString url);
+    void startUnzipping(QString file);
 signals:
-    void doneGettingAssetsUrl(QString &url);
-    void doneGettingZipDownloadUrl(QString &url);
+    void doneGettingAssetsUrl(QString url);
+    void doneGettingZipDownloadUrl(QString url);
+    void doneDownloadingZip(QString file);
     void promptMessage(QString url);
 };
 
