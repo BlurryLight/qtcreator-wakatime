@@ -56,7 +56,6 @@ private slots:
     void onAboutToSave(Core::IDocument *document);
     void onEditorStateChanged();
 
-    void onIgnorePaternChanged();
     void onInStatusBarChanged();
 
     void onNetReply(QNetworkReply *reply);

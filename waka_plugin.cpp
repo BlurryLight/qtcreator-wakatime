@@ -111,8 +111,6 @@ void WakaPlugin::onDoneSettingUpCLI(){
     _wakaOptions.reset(new WakaOptions);
     new WakaOptionsPage(_wakaOptions, this);
 
-    //connect(_wakaOptions.data(), &WakaOptions::ignorePaternChanged,
-    //        this, &WakaPlugin::onIgnorePaternChanged);
     //connect(_wakaOptions.data(), &WakaOptions::inStatusBarChanged,
     //        this, &WakaPlugin::onInStatusBarChanged);
 
@@ -124,7 +122,6 @@ void WakaPlugin::onDoneSettingUpCLI(){
     //        this, &WakaPlugin::onEditorChanged);
 
     //onApiKeyChanged();
-    //onIgnorePaternChanged();
     //onInStatusBarChanged();
 
     //QTC_ASSERT(!_wakaOptions->isDebug(),ShowMessagePrompt("Waka plugin initialized!"));
@@ -221,10 +218,6 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
     }
 }
 
-void WakaPlugin::onIgnorePaternChanged()
-{
-    _ignore_patern = _wakaOptions->ignorePatern();
-}
 
 void WakaPlugin::onInStatusBarChanged()
 {
