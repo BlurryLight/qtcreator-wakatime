@@ -73,9 +73,6 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
-    //setup networkaccessmanager
-    _netManager = new QNetworkAccessManager(this);
-
     _cliGetter = new CliGetter();
 
     _cliGettingThread = new QThread(this);
@@ -112,10 +109,8 @@ void WakaPlugin::onDoneSettingUpCLI(){
 
     _req_url = std::make_unique<QUrl>();
     _wakaOptions.reset(new WakaOptions);
-    //new WakaOptionsPage(_wakaOptions, this);
+    new WakaOptionsPage(_wakaOptions, this);
 
-    //connect(_netManager, &QNetworkAccessManager::finished,
-    //        this, &WakaPlugin::onNetReply);
     //connect(_wakaOptions.data(), &WakaOptions::apiKeyChanged,
     //        this, &WakaPlugin::onApiKeyChanged);
     //connect(_wakaOptions.data(), &WakaOptions::ignorePaternChanged,
@@ -212,7 +207,8 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
     QString useragent;
     useragent = QString("%1-%2-Qt Creator wakatime Qt %3").arg(QSysInfo::kernelType(), QSysInfo::kernelVersion(), QStringLiteral(QT_VERSION_STR));
     request.setHeader(QNetworkRequest::UserAgentHeader, useragent);
-    _netManager->post(request, heartbeat_json);
+    //TODO: remove this since we won't use it
+    //_netManager->post(request, heartbeat_json);
 
         QTC_ASSERT(!_wakaOptions->isDebug(),
                    ShowMessagePrompt(QString("Heartbeat send => %1 ").arg(QString::fromUtf8(heartbeat_json))));
@@ -251,15 +247,6 @@ void WakaPlugin::onInStatusBarChanged()
 
         Core::StatusBarManager::addStatusBarWidget(_heartBeatButton, Core::StatusBarManager::RightCorner);
     }
-}
-
-void WakaPlugin::onNetReply(QNetworkReply *reply) {
-  QTC_ASSERT(!_wakaOptions->isDebug(),
-                         ShowMessagePrompt(QString("Network reply => %1")
-                     .arg(QString::fromUtf8(reply->readAll()))));
-  int status =
-      reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-  QTC_ASSERT(!_wakaOptions->isDebug(), ShowMessagePrompt(QString("Network reply code => %1").arg(QString::number(status))));
 }
 
 void WakaPlugin::onEditorAboutToChange(Core::IEditor *editor)

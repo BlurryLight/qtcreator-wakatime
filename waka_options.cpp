@@ -8,12 +8,12 @@ namespace Internal {
 
 namespace
 {
-const char GROUP[]                              = "General";
-const char IS_DEBUG[]                           = "isDebug";
-const char IS_ENABLED[]                         = "isEnabled";
-const char IN_STATUS_BAR[]                      = "inStatusBar";
-const char API_KEY[]                            = "API_KEY";
-const char IGNORE_PATERN[]                      = "IGNORE_PATERN";
+constexpr char GROUP[]                              = "General";
+constexpr char IS_DEBUG[]                           = "isDebug";
+constexpr char IS_ENABLED[]                         = "isEnabled";
+constexpr char IN_STATUS_BAR[]                      = "inStatusBar";
+constexpr char API_KEY[]                            = "API_KEY";
+constexpr char IGNORE_PATERN[]                      = "IGNORE_PATERN";
 }
 
 WakaOptions::WakaOptions(QObject *parent) : QObject (parent)

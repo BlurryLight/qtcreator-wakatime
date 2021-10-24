@@ -47,10 +47,6 @@ public:
     void trySendHeartbeat(const QString &entry, bool isSaving);
     static QDir getWakaCLILocation();
 
-    QNetworkAccessManager *getNetworkManager() const{
-        return _netManager;
-    }
-
 private:
     bool checkIfWakaCLIExist();
 
@@ -81,7 +77,6 @@ private:
     QThread *_cliGettingThread;
     std::unique_ptr<QUrl> _req_url;
     QPointer<QToolButton> _heartBeatButton;
-    QNetworkAccessManager *_netManager;
     QSharedPointer<WakaOptions> _wakaOptions;
 
     const int64_t _cooldownTime = 120;
