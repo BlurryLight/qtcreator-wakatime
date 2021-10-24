@@ -57,7 +57,6 @@ private slots:
     void onEditorStateChanged();
 
     void onIgnorePaternChanged();
-    void onApiKeyChanged();
     void onInStatusBarChanged();
 
     void onNetReply(QNetworkReply *reply);

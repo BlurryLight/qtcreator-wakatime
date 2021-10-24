@@ -111,8 +111,6 @@ void WakaPlugin::onDoneSettingUpCLI(){
     _wakaOptions.reset(new WakaOptions);
     new WakaOptionsPage(_wakaOptions, this);
 
-    //connect(_wakaOptions.data(), &WakaOptions::apiKeyChanged,
-    //        this, &WakaPlugin::onApiKeyChanged);
     //connect(_wakaOptions.data(), &WakaOptions::ignorePaternChanged,
     //        this, &WakaPlugin::onIgnorePaternChanged);
     //connect(_wakaOptions.data(), &WakaOptions::inStatusBarChanged,
@@ -226,11 +224,6 @@ void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
 void WakaPlugin::onIgnorePaternChanged()
 {
     _ignore_patern = _wakaOptions->ignorePatern();
-}
-
-void WakaPlugin::onApiKeyChanged()
-{
-    _req_url->setUrl(_urlPrefix + _wakaOptions->apiKey());
 }
 
 void WakaPlugin::onInStatusBarChanged()
