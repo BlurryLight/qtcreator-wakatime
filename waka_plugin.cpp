@@ -110,8 +110,8 @@ void WakaPlugin::onDoneSettingUpCLI(){
     //check if user has asked for updated version
     //if so, then try update the version of wakatime-cli
 
-    //_req_url = std::make_unique<QUrl>();
-    //_wakaOptions.reset(new WakaOptions);
+    _req_url = std::make_unique<QUrl>();
+    _wakaOptions.reset(new WakaOptions);
     //new WakaOptionsPage(_wakaOptions, this);
 
     //connect(_netManager, &QNetworkAccessManager::finished,
