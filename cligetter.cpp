@@ -70,7 +70,7 @@ void CliGetter::startUnzipping(QString location){
     QFile zipFile(location);
     zipFile.remove();
 
-    emit doneSettingWakaTimeCli(waka_extracted_dir.path());
+    emit doneSettingWakaTimeCli();
 }
 
 void CliGetter::startDownloadingZip(QString url){

@@ -32,7 +32,7 @@ signals:
     void doneGettingZipDownloadUrl(QString url);
     void doneDownloadingZip(QString file);
     void promptMessage(QString url);
-    void doneSettingWakaTimeCli(QString location);
+    void doneSettingWakaTimeCli();
 };
 
 } // namespace Internal

@@ -35,7 +35,7 @@
 namespace Wakatime {
 namespace Internal {
 
-WakaPlugin::WakaPlugin(){}
+WakaPlugin::WakaPlugin():_cliIsSetup(false){}
 
 WakaPlugin::~WakaPlugin()
 {
@@ -81,6 +81,9 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     _cliGettingThread = new QThread(this);
     _cliGetter->moveToThread(_cliGettingThread);
 
+    connect(this,&WakaPlugin::doneGettingCliAndSettingItUp,
+            this,&WakaPlugin::onDoneSettingUpCLI);
+
     //check if has wakatime-cli in path
     bool waka_cli_found = checkIfWakaCLIExist();
     //if not then try download it based of the users operating system
@@ -88,14 +91,25 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
         _cliGetter->connect(_cliGettingThread,&QThread::started,
                             _cliGetter,&CliGetter::startGettingAssertUrl);
         connect(_cliGetter,&CliGetter::promptMessage,this,&ShowMessagePrompt);
+        connect(_cliGetter,&CliGetter::doneSettingWakaTimeCli,
+                [plugin = this](){
+            plugin->_cliIsSetup=true;
+            emit plugin->doneGettingCliAndSettingItUp();
+        });
+    }else{
+        emit this->doneGettingCliAndSettingItUp();
     }
     _cliGettingThread->start();
-    // and store the path in a variable
+    return true;
+}
+
+void WakaPlugin::onDoneSettingUpCLI(){
+    ShowMessagePrompt("WakatimeCLI setup");
 
     //check if is latest version
     //check if user has asked for updated version
     //if so, then try update the version of wakatime-cli
-    
+
     //_req_url = std::make_unique<QUrl>();
     //_wakaOptions.reset(new WakaOptions);
     //new WakaOptionsPage(_wakaOptions, this);
@@ -121,7 +135,6 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     //onInStatusBarChanged();
 
     //QTC_ASSERT(!_wakaOptions->isDebug(),ShowMessagePrompt("Waka plugin initialized!"));
-    return true;
 }
 
 void WakaPlugin::extensionsInitialized()

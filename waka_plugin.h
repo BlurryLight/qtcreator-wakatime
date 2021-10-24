@@ -65,15 +65,17 @@ private slots:
     void onInStatusBarChanged();
 
     void onNetReply(QNetworkReply *reply);
+    void onDoneSettingUpCLI();
 
+signals:
+    void doneGettingCliAndSettingItUp();
 
 private:
     qint64 _lastTime = 0;
     QString _lastEntry{""};
 
-    QString _location_of_cli;//location where wakatime-cli is to be stored
-
-    CliGetter *_cliGetter;
+    CliGetter *_cliGetter;//managing accessing wakatime-cli
+    bool _cliIsSetup;
 
     QString _ignore_patern;
     QThread *_cliGettingThread;
