@@ -45,14 +45,12 @@ public:
     ShutdownFlag aboutToShutdown();
 
     void trySendHeartbeat(const QString &entry, bool isSaving);
+    static QDir getWakaCLILocation();
 
     QNetworkAccessManager *getNetworkManager() const{
         return _netManager;
     }
 
-    const OSInfo &getOsInfo() const{
-        return this->_os_running_on;
-    }
 private:
     bool checkIfWakaCLIExist();
 
@@ -74,7 +72,6 @@ private:
     QString _lastEntry{""};
 
     QString _location_of_cli;//location where wakatime-cli is to be stored
-    OSInfo _os_running_on;//mark the os qtcreator is running in
 
     CliGetter *_cliGetter;
 

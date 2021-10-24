@@ -36,14 +36,16 @@ void CliGetter::startUnzipping(QString location){
     }
 
     //create directory where to store unzipped files in
-    QDir waka_extracted_dir(QDir::homePath()+QDir::separator()+".wakatime-cli-qtc");
+    auto waka_extracted_dir = WakaPlugin::getWakaCLILocation();
     if(!waka_extracted_dir.exists()){
         waka_extracted_dir.mkpath(waka_extracted_dir.path());
     }
 
-    QuaZipFile file(&zip);
+
     QString msg("Starting Extracting files");
     emit promptMessage(msg);
+
+    QuaZipFile file(&zip);
     for(bool success=zip.goToFirstFile();success;success=zip.goToNextFile()){
         //get file name
         QuaZipFileInfo fileinfo;
@@ -59,12 +61,16 @@ void CliGetter::startUnzipping(QString location){
         f.flush();
         f.close();
     }
+
     msg="Done Extracting files";
     emit promptMessage(msg);
+
     zip.close();
     //delete the zipped file
     QFile zipFile(location);
     zipFile.remove();
+
+    emit doneSettingWakaTimeCli(waka_extracted_dir.path());
 }
 
 void CliGetter::startDownloadingZip(QString url){

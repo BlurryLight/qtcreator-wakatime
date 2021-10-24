@@ -52,7 +52,7 @@ void WakaPlugin::ShowMessagePrompt(const QString str){
 #endif
 }
 
-QFile getWakaCLILocation(){
+QDir WakaPlugin::getWakaCLILocation(){
     QString default_path = QDir::homePath()+"/.wakatime/wakatime-cli";
     return default_path;
 }
@@ -88,8 +88,8 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
         _cliGetter->connect(_cliGettingThread,&QThread::started,
                             _cliGetter,&CliGetter::startGettingAssertUrl);
         connect(_cliGetter,&CliGetter::promptMessage,this,&ShowMessagePrompt);
-        _cliGettingThread->start();
     }
+    _cliGettingThread->start();
     // and store the path in a variable
 
     //check if is latest version
