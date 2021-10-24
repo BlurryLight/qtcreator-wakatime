@@ -81,6 +81,8 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     connect(this,&WakaPlugin::doneGettingCliAndSettingItUp,
             this,&WakaPlugin::onDoneSettingUpCLI);
 
+    _cliGettingThread->start();
+
     //check if has wakatime-cli in path
     bool waka_cli_found = checkIfWakaCLIExist();
     //if not then try download it based of the users operating system
@@ -96,7 +98,6 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
     }else{
         emit this->doneGettingCliAndSettingItUp();
     }
-    _cliGettingThread->start();
     return true;
 }
 
@@ -111,20 +112,19 @@ void WakaPlugin::onDoneSettingUpCLI(){
     _wakaOptions.reset(new WakaOptions);
     new WakaOptionsPage(_wakaOptions, this);
 
-    //connect(_wakaOptions.data(), &WakaOptions::inStatusBarChanged,
-    //        this, &WakaPlugin::onInStatusBarChanged);
+    connect(_wakaOptions.data(), &WakaOptions::inStatusBarChanged,
+            this, &WakaPlugin::onInStatusBarChanged);
 
-    //connect(Core::EditorManager::instance(), &Core::EditorManager::aboutToSave,
-    //        this, &WakaPlugin::onAboutToSave);
-    //connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorAboutToChange,
-    //        this, &WakaPlugin::onEditorAboutToChange);
-    //connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged,
-    //        this, &WakaPlugin::onEditorChanged);
+    connect(Core::EditorManager::instance(), &Core::EditorManager::aboutToSave,
+            this, &WakaPlugin::onAboutToSave);
+    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorAboutToChange,
+            this, &WakaPlugin::onEditorAboutToChange);
+    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged,
+            this, &WakaPlugin::onEditorChanged);
 
-    //onApiKeyChanged();
-    //onInStatusBarChanged();
+    onInStatusBarChanged();
 
-    //QTC_ASSERT(!_wakaOptions->isDebug(),ShowMessagePrompt("Waka plugin initialized!"));
+    QTC_ASSERT(!_wakaOptions->isDebug(),ShowMessagePrompt("Waka plugin initialized!"));
 }
 
 void WakaPlugin::extensionsInitialized()
@@ -240,7 +240,9 @@ void WakaPlugin::onEditorAboutToChange(Core::IEditor *editor)
     if(!editor)
         return;
 
-    disconnect(TextEditor::TextEditorWidget::currentTextEditorWidget(), &TextEditor::TextEditorWidget::textChanged, this, &WakaPlugin::onEditorStateChanged);
+    disconnect(TextEditor::TextEditorWidget::currentTextEditorWidget(),
+               &TextEditor::TextEditorWidget::textChanged,
+               this, &WakaPlugin::onEditorStateChanged);
 }
 
 void WakaPlugin::onEditorChanged(Core::IEditor *editor)
