@@ -5,6 +5,8 @@
 #include <coreplugin/coreplugin.h>
 #include <coreplugin/messagemanager.h>
 #include <waka_plugin.h>
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 #include <QDir>
 
 namespace Wakatime {
@@ -25,10 +27,44 @@ CliGetter::CliGetter(){
 
 void CliGetter::startUnzipping(QString location){
     QString fileExists("File exists @: ");
-    if(QFile(location).exists()){
-        fileExists+=location;
-        emit promptMessage(fileExists);
+    fileExists+=location;
+    emit promptMessage(fileExists);
+
+    QuaZip zip(location);
+    if(!zip.open(QuaZip::Mode::mdUnzip)){
+        emit promptMessage("Error, couldn't read zip file");
     }
+
+    //create directory where to store unzipped files in
+    QDir waka_extracted_dir(QDir::homePath()+QDir::separator()+".wakatime-cli-qtc");
+    if(!waka_extracted_dir.exists()){
+        waka_extracted_dir.mkpath(waka_extracted_dir.path());
+    }
+
+    QuaZipFile file(&zip);
+    QString msg("Starting Extracting files");
+    emit promptMessage(msg);
+    for(bool success=zip.goToFirstFile();success;success=zip.goToNextFile()){
+        //get file name
+        QuaZipFileInfo fileinfo;
+        file.getFileInfo(&fileinfo);
+        QFile f(waka_extracted_dir.path()+QDir::separator()+fileinfo.name);
+        f.open(QIODevice::WriteOnly);
+
+        file.open(QIODevice::ReadOnly);
+        f.write(file.readAll());
+        f.setPermissions(QFile::Permission::ExeUser | QFile::Permission::ReadUser | QFile::Permission::WriteUser);
+
+        file.close();
+        f.flush();
+        f.close();
+    }
+    msg="Done Extracting files";
+    emit promptMessage(msg);
+    zip.close();
+    //delete the zipped file
+    QFile zipFile(location);
+    zipFile.remove();
 }
 
 void CliGetter::startDownloadingZip(QString url){
@@ -39,7 +75,7 @@ void CliGetter::startDownloadingZip(QString url){
 
     auto req = QNetworkRequest(url);
     req.setSslConfiguration(_sslConfig);
-    req.setAttribute(QNetworkRequest::FollowRedirectsAttribute,true);
+    req.setAttribute(QNetworkRequest::RedirectPolicyAttribute,true);
     auto reply = _netMan->get(req);
 
     reply->connect(reply,&QNetworkReply::finished,[cli=this,wakatime_cli_zip,reply](){

@@ -15,11 +15,14 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 
+# for setting up quazip
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(SetupQuazip)
+
 # use static openssl
 set(OPENSSL_USE_STATIC_LIBS ON)
 find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(QtCreator COMPONENTS Core ProjectExplorer REQUIRED)
 
@@ -57,6 +60,7 @@ add_qtc_plugin(${PROJECT_NAME}
         QtCreator::Utils
 		OpenSSL::SSL
 		ZLIB::ZLIB
+		QuaZip::QuaZip
     SOURCES
         #.github/workflows/build_cmake.yml
         #.github/workflows/README.md
