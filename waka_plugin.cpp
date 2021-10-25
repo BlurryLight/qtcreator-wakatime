@@ -143,85 +143,8 @@ ExtensionSystem::IPlugin::ShutdownFlag WakaPlugin::aboutToShutdown()
   // Save settings
   // Disconnect from signals that are not needed during shutdown
   // Hide UI (if you add UI that is not in the main window directly)
-
-  // don't do that. Potential race condition.
-  //    trySendHeartbeat(Core::EditorManager::currentDocument()->filePath().toString(),
-  //    true);
-    QTC_ASSERT(!_wakaOptions->isDebug(),
-               ShowMessagePrompt( "Plugin is going to shutdown\n"));
   return SynchronousShutdown;
 }
-
-void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
-{
-  thread_local QJsonObject heartbeat{
-      {"entity", QString()},
-      {"entity_type", QString("file")},
-      {"category", QString("coding")},
-      {"time", 0},
-      {"project", QString("")},
-      {"exclude", QString("")},
-      {"branch", QString("master")},
-      {"plugin", QString("QtCreator-wakatime/0.1.0")},
-      {"is_write", false},
-      {"is_debugging", false},
-      {"lineno", 1},
-      {"language", QString("C++")}};
-
-  QTC_ASSERT(_wakaOptions->isEnabled(),
-             QTC_ASSERT(!_wakaOptions->isDebug(),
-                        ShowMessagePrompt("Wakatime reporting explicitly disabled!"));
-             return;);
-  QTC_ASSERT(_wakaOptions->hasKey(),
-                         ShowMessagePrompt("API key not set! Wakatime reporting disabled!"));
-
-  qint64 curr_time = time(nullptr);
-  if (curr_time - _lastTime < _cooldownTime && !isSaving &&
-      _lastEntry == entry) {
-    QTC_ASSERT(!_wakaOptions->isDebug(),
-                             ShowMessagePrompt(QString("Heartbeat NOT send dt => %1, is_write => %2")
-                       .arg(curr_time - _lastTime)
-                       .arg(isSaving)));
-    return;
-    }
-
-    heartbeat["entity"] = _lastEntry = entry;
-    heartbeat["time"] = _lastTime = curr_time;
-    if (const auto &project = ProjectExplorer::ProjectTree::currentProject())
-        heartbeat["project"] = project->displayName();
-    heartbeat["is_write"] = isSaving;
-    heartbeat["is_debugging"] = _wakaOptions->isDebug();
-    heartbeat["exclude"] = _ignore_patern;
-    heartbeat["lineno"] = Core::EditorManager::currentEditor()->currentLine();
-
-    QJsonDocument jdoc(heartbeat);
-    QByteArray heartbeat_json = jdoc.toJson();
-
-    QNetworkRequest request;
-    QSslConfiguration config = QSslConfiguration::defaultConfiguration();
-    config.setProtocol(QSsl::TlsV1_2);
-    request.setSslConfiguration(config);
-    request.setUrl(*_req_url.get());
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    QString useragent;
-    useragent = QString("%1-%2-Qt Creator wakatime Qt %3").arg(QSysInfo::kernelType(), QSysInfo::kernelVersion(), QStringLiteral(QT_VERSION_STR));
-    request.setHeader(QNetworkRequest::UserAgentHeader, useragent);
-    //TODO: remove this since we won't use it
-    //_netManager->post(request, heartbeat_json);
-
-        QTC_ASSERT(!_wakaOptions->isDebug(),
-                   ShowMessagePrompt(QString("Heartbeat send => %1 ").arg(QString::fromUtf8(heartbeat_json))));
-
-    if(_wakaOptions->inStatusBar())
-    {
-        _heartBeatButton->setDisabled(false);
-        QTimer::singleShot(200, [this]()
-        {
-            _heartBeatButton->setDisabled(true);
-        });
-    }
-}
-
 
 void WakaPlugin::onInStatusBarChanged()
 {
