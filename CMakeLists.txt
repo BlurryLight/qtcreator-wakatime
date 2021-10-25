@@ -8,7 +8,7 @@ set(QT_CREATOR_SKIP_VCPKG_SETUP ON)
 # Remove when sharing with others.
 #list(APPEND CMAKE_PREFIX_PATH "/Path/to/Qtcreator/Build/Dir")
 
-project(Wakatime)
+project(Wakatime VERSION 0.1.1)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -75,3 +75,6 @@ add_qtc_plugin(${PROJECT_NAME}
 string(COMPARE LESS ${IDE_QT_VERSION_MIN} "5.15.0" IDE_LESS_15_VERSION)
 target_compile_definitions(${PROJECT_NAME} PUBLIC IDE_LESS_15_VERSION=${IDE_LESS_15_VERSION})
 message(STATUS "QTCREATOR_VERSION: ${IDE_LESS_15_VERSION}")
+
+# add information about version
+target_compile_definitions(${PROJECT_NAME} PUBLIC WAKATIME_PLUGIN_VERSION="${CMAKE_PROJECT_VERSION}")

@@ -8,6 +8,7 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 #include <QDir>
+#include <QDirIterator>
 
 namespace Wakatime {
 namespace Internal {
@@ -23,6 +24,25 @@ CliGetter::CliGetter(){
             this,&CliGetter::startDownloadingZip);
     connect(this,&CliGetter::doneDownloadingZip,
             this,&CliGetter::startUnzipping);
+}
+
+void CliGetter::startHearBeat(QString file){
+    if(_wakaCliExecutablePath.isEmpty()){
+        //get the executable path
+        auto dir = WakaPlugin::getWakaCLILocation();
+        auto iterator = QDirIterator(dir.absolutePath());
+        while(iterator.hasNext()){
+            auto f = iterator.next();
+            if(iterator.fileInfo().isFile()){
+                _wakaCliExecutablePath=f;
+            }
+        }
+    }
+
+    QString exec (_wakaCliExecutablePath+" --plugin QtCreator-wakatime/"+WAKATIME_PLUGIN_VERSION
+                  +" --entity "+file);
+    //run the hearbeat here
+    system(exec.toStdString().c_str());
 }
 
 void CliGetter::startUnzipping(QString location){

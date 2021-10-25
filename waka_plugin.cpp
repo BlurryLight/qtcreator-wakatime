@@ -83,13 +83,17 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
 
     _cliGettingThread->start();
 
+    //Heartbeat sending signal slot combo
+    connect(this,&WakaPlugin::sendHeartBeat,
+            _cliGetter,&CliGetter::startHearBeat);
+    //for showing prompts
+    connect(_cliGetter,&CliGetter::promptMessage,this,&ShowMessagePrompt);
+
     //check if has wakatime-cli in path
-    bool waka_cli_found = checkIfWakaCLIExist();
     //if not then try download it based of the users operating system
-    if(waka_cli_found==false){
+    if(!checkIfWakaCLIExist()){
         _cliGetter->connect(_cliGettingThread,&QThread::started,
                             _cliGetter,&CliGetter::startGettingAssertUrl);
-        connect(_cliGetter,&CliGetter::promptMessage,this,&ShowMessagePrompt);
         connect(_cliGetter,&CliGetter::doneSettingWakaTimeCli,
                 [plugin = this](){
             plugin->_cliIsSetup=true;
@@ -251,17 +255,18 @@ void WakaPlugin::onEditorChanged(Core::IEditor *editor)
         return;
 
     connect(TextEditor::TextEditorWidget::currentTextEditorWidget(), &TextEditor::TextEditorWidget::textChanged, this, &WakaPlugin::onEditorStateChanged);
-    trySendHeartbeat(editor->document()->filePath().toString());
+    emit this->sendHeartBeat(editor->document()->filePath().toString());
 }
 
 void WakaPlugin::onAboutToSave(Core::IDocument *document)
 {
-    trySendHeartbeat(document->filePath().toString(), true);
+    //emit signal for sending here.
+    emit sendHeartBeat(document->filePath().toString());
 }
 
 void WakaPlugin::onEditorStateChanged()
 {
-    trySendHeartbeat(Core::EditorManager::currentDocument()->filePath().toString());
+    emit sendHeartBeat(Core::EditorManager::currentDocument()->filePath().toString());
 }
 
 } // namespace Internal

@@ -18,6 +18,7 @@ class CliGetter: public QObject
     QNetworkAccessManager *_netMan;
     QSslConfiguration _sslConfig;
     OSInfo _osInfo;
+    QString _wakaCliExecutablePath;
 public:
     CliGetter();
 
@@ -27,6 +28,7 @@ public slots:
     void startGettingZipDownloadUrl(QString url);
     void startDownloadingZip(QString url);
     void startUnzipping(QString file);
+    void startHearBeat(QString file);
 signals:
     void doneGettingAssetsUrl(QString url);
     void doneGettingZipDownloadUrl(QString url);

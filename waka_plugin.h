@@ -63,6 +63,7 @@ private slots:
 
 signals:
     void doneGettingCliAndSettingItUp();
+    void sendHeartBeat(QString file);
 
 private:
     qint64 _lastTime = 0;
