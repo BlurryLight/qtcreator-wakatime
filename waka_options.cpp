@@ -11,7 +11,7 @@ namespace Internal {
 namespace
 {
 constexpr char SETTINGS_GROUP[]                     = "settings";
-constexpr char PERSONAL_SETTINGS_GROUP[]            = "settings";
+constexpr char PERSONAL_SETTINGS_GROUP[]            = "personal_settings";
 constexpr char IS_DEBUG[]                           = "debug";
 constexpr char IS_ENABLED[]                         = "enabled";
 constexpr char IN_STATUS_BAR[]                      = "status_bar_enabled";
