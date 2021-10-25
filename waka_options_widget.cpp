@@ -29,7 +29,7 @@ WakaOptionsWidget::~WakaOptionsWidget()
 void WakaOptionsWidget::restore()
 {
    _ui->apiKeyLineEdit->setText(_options->apiKey());
-   _ui->excludePaternLineEdit->setText(_options->ignorePatern());
+   _ui->excludePaternLineEdit->setText(_options->excludePattern());
    _ui->inStatusBarCheckBox->setChecked(_options->inStatusBar());
    _ui->debugCheckBox->setChecked(_options->isDebug());
    _ui->enabledCheckBox->setChecked(_options->isEnabled());
@@ -38,7 +38,7 @@ void WakaOptionsWidget::restore()
 void WakaOptionsWidget::apply()
 {
     _options->setApiKey(_ui->apiKeyLineEdit->text());
-    _options->setIgnorePatern(_ui->excludePaternLineEdit->text());
+    _options->setExcludePatern(_ui->excludePaternLineEdit->text());
     _options->setStatusBar(_ui->inStatusBarCheckBox->isChecked());
     _options->setDebug(_ui->debugCheckBox->isChecked());
     _options->setEnabled(_ui->enabledCheckBox->isChecked());
