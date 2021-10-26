@@ -93,7 +93,7 @@ jobs:
       id: build_qtc
       run: |
         cd ${{steps.qt_creator.outputs.qtc_dir}} && mkdir build
-        cd ${{steps.qt_creator.outputs.qtc_dir}}/build && cmake -DCMAKE_BUILD_TYPE=Release
+        cd ${{steps.qt_creator.outputs.qtc_dir}}/build && cmake ../ -DCMAKE_BUILD_TYPE=Release
         cd ${{steps.qt_creator.outputs.qtc_dir}}/build && cmake --build . --config Release
 
     - name: Build
