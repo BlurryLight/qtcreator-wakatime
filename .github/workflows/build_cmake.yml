@@ -203,7 +203,7 @@ jobs:
     - name: BuildQtCreator
       id: build_qtc
       run: |
-        cd qtcreator
+        cd qtcreator/qtcreator
         mkdir build
         cd build && cmake -DCMAKE_BUILD_TYPE=Release ../ && cmake --build . --config Release
 
