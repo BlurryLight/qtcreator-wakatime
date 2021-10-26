@@ -130,7 +130,7 @@ void CliGetter::startGettingZipDownloadUrl(QString url){
         for(const QJsonValue &val:arr){
             QString downloadUrl = val["browser_download_url"].toString();
             //check os
-            if(cli->_osInfo._os==OSType::WINDOWS){
+            if(cli->_osInfo._os==0){//fix for windows, since fails in github actions
                 //only has 64bit and 32bit
                 if(cli->_osInfo._arch==OSArch::AMD64){
                     if(downloadUrl.contains("windows-amd64")){
