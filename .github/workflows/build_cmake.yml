@@ -155,11 +155,10 @@ jobs:
           )
         endif()
 
-	- name: Setup vcpkg
-	  id: vcpkg
-	  run: |
-		git clone https://github.com/microsoft/vcpkg.git
-		dir
+    - name: Setup vcpkg
+      id: vcpkg
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git && dir
 
     - name: Download Qt Creator
       id: qt_creator
