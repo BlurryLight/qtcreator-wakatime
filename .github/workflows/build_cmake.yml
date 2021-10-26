@@ -89,13 +89,6 @@ jobs:
             ${CMAKE_COMMAND} -E tar xvf ../${package}.7z WORKING_DIRECTORY qtcreator)
         endforeach()
 
-    - name: Build QtCreator
-      id: build_qtc
-      run: |
-        cd ${{steps.qt_creator.outputs.qtc_dir}} && mkdir build
-        cd ${{steps.qt_creator.outputs.qtc_dir}}/build && cmake ../ -DCMAKE_BUILD_TYPE=Release
-        cd ${{steps.qt_creator.outputs.qtc_dir}}/build && cmake --build . --config Release
-
     - name: Build
       shell: cmake -P {0}
       run: |
@@ -125,8 +118,7 @@ jobs:
             --name "$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}"
             --src .
             --build build
-            --add-config=-DCMAKE_TOOLCHAIN=${CMAKE_CURRENT_SOURCE_DIR}/../vcpkg/scripts/buildsystems/vcpkg.cmake
-            --qt-path "${{ steps.qt.outputs.qt_dir }}"
+            --add-config=-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/../vcpkg/scripts/buildsystems/vcpkg.cmake
             --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
             --output-path "$ENV{GITHUB_WORKSPACE}"
           RESULT_VARIABLE result
