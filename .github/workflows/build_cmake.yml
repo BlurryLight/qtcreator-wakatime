@@ -155,16 +155,6 @@ jobs:
           )
         endif()
 
-    - name: Setup vcpkg Windows
-      id: vcpkp
-      if: matrix.config.os == 'windows-latest'
-      run: git clone https://github.com/microsoft/vcpkg.git && dir
-
-    - name: Setup vcpkg Mac and Linux
-      id: vcpkg
-      if: matrix.config.os != 'windows-latest'
-      run: git clone https://github.com/microsoft/vcpkg.git && ls
-
     - name: Download Qt Creator
       id: qt_creator
       shell: cmake -P {0}
@@ -222,6 +212,10 @@ jobs:
 
         set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
 
+        FetchContent_Declare(vcpkg
+            GIT_REPOSITORY https://github.com/microsoft/vcpkg.git
+        )
+
         execute_process(
           COMMAND python
             -u
@@ -229,7 +223,7 @@ jobs:
             --name "$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}"
             --src .
             --build build
-            --add-config -DCMAKE_TOOLCHAIN=${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
+            --add-config=-DCMAKE_TOOLCHAIN=${vcpkg_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake
             --qt-path "${{ steps.qt.outputs.qt_dir }}"
             --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
             --output-path "$ENV{GITHUB_WORKSPACE}"
