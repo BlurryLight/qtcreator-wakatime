@@ -155,15 +155,15 @@ jobs:
           )
         endif()
 
-	- name: Setup vcpkg Windows
-      id: vcpkg
-	  if: matrix.config.os == 'windows-latest'
-	  run: git clone https://github.com/microsoft/vcpkg.git && dir
+    - name: Setup vcpkg Windows
+      id: vcpkp
+      if: matrix.config.os == 'windows-latest'
+      run: git clone https://github.com/microsoft/vcpkg.git && dir
 
-	- name: Setup vcpkg Mac and Linux
-	  id: vcpkg
-	  if: matrix.config.os != 'windows-latest'
-	  run: git clone https://github.com/microsoft/vcpkg.git && ls
+    - name: Setup vcpkg Mac and Linux
+      id: vcpkg
+      if: matrix.config.os != 'windows-latest'
+      run: git clone https://github.com/microsoft/vcpkg.git && ls
 
     - name: Download Qt Creator
       id: qt_creator
