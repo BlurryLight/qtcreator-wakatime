@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # for setting the vcpkg path to be used
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_TOOLCHAIN_FILE}$ENV{CMAKE_TOOLCHAIN_FILE})
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_TOOLCHAIN_FILE})
 #for stopping qtcreator using it's on vcpkg setup
 set(QT_CREATOR_SKIP_VCPKG_SETUP ON)
 
