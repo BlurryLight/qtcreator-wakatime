@@ -91,7 +91,6 @@ jobs:
 
     - name: Build QtCreator
       id: build_qtc
-      needs: qt_creator
       run: |
         cd ${{steps.qt_creator.outputs.qtc_dir}} && mkdir build
         cd ${{steps.qt_creator.outputs.qtc_dir}}/build && cmake -DCMAKE_BUILD_TYPE=Release
