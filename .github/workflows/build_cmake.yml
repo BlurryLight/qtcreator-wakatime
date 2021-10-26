@@ -200,6 +200,10 @@ jobs:
             ${CMAKE_COMMAND} -E tar xvf ../${package}.7z WORKING_DIRECTORY qtcreator)
         endforeach()
 
+    - name: BuildQtCreator
+      id: build_qtc
+      run: cd qtcreator && mkdir build && cmake -DCMAKE_BUILD_TYPE=Release && cmake --build . --config Release
+
     - name: Build
       shell: cmake -P {0}
       run: |
