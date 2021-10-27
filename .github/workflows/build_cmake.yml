@@ -215,7 +215,7 @@ jobs:
           endforeach()
         endif()
 
-        if("${{runer.os}} STREQUAL "Windows")
+        if("${{runner.os}} STREQUAL "Windows")
             execute_process(
               COMMAND "${{ matrix.config.environment_script }}" && python
                 -u
