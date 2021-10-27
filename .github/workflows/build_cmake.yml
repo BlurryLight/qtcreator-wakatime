@@ -196,8 +196,8 @@ jobs:
         endforeach()
 
     - name: Build
-      if: matrix.os.config == "windows-latest"
       id: build
+      if: matrix.config.os == 'windows-latest'
       run: |
         ${{ matrix.config.environment_script }} && python
           -u
@@ -211,8 +211,8 @@ jobs:
           --output-path "$ENV{GITHUB_WORKSPACE}"
 
     - name: Build Linux
-      if: matrix.os.config != "windows-latest"
       id: build
+      if: matrix.os.config != "windows-latest"
       run: |
         python -u
            ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
