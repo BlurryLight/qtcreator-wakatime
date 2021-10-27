@@ -1,4 +1,4 @@
-# <u>WARNING: PORTING TO CMAKE AND USE [WAKATIME-CLI](https://github.com/wakatime/wakatime-cli) STILL ONGOING</u>
+# <u>PORTED TO CMAKE AND USE [WAKATIME-CLI](https://github.com/wakatime/wakatime-cli) DONE</u>
 
 # Fork
 
