@@ -195,7 +195,7 @@ jobs:
             ${CMAKE_COMMAND} -E tar xvf ../${package}.7z WORKING_DIRECTORY qtcreator)
         endforeach()
 
-    - name: Build
+    - name: Build Windows
       id: build
       if: matrix.config.os == 'windows-latest'
       run: |
@@ -223,7 +223,6 @@ jobs:
            --qt-path "${{ steps.qt.outputs.qt_dir }}"
            --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
            --output-path "$ENV{GITHUB_WORKSPACE}"
-
 
     - uses: actions/upload-artifact@v2
       id: upload_artifact
