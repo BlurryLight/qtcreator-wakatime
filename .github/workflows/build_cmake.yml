@@ -212,7 +212,7 @@ jobs:
 
     - name: Build Linux
       id: build-linux
-      if: matrix.os.config != "windows-latest"
+      if: matrix.config.os != 'windows-latest'
       run: |
         python -u
            ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
