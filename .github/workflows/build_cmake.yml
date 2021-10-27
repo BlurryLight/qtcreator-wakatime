@@ -215,6 +215,8 @@ jobs:
           endforeach()
         endif()
 
+        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
+
         if("${{runner.os}} STREQUAL "Windows")
             execute_process(
               COMMAND "${{ matrix.config.environment_script }}" && python
@@ -245,7 +247,6 @@ jobs:
             )
         endif()
 
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
 
         if (NOT result EQUAL 0)
           string(REGEX MATCH "FAILED:.*$" error_message "${output}")
