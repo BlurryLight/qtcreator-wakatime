@@ -159,7 +159,7 @@ jobs:
 
         if ("${{ runner.os }}" STREQUAL "Windows")
             execute_process(
-              COMMAND "${{ matrix.config.environment_script" }} && python
+              COMMAND "${{ matrix.config.environment_script }}" && python
                 -u
                 ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
                 --name "$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}"
