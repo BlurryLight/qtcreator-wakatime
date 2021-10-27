@@ -196,7 +196,7 @@ jobs:
         endforeach()
 
     - name: Build
-      if: matrix.os.config == "Windows"
+      if: matrix.os.config == "windows-latest"
       id: build
       run: |
         ${{ matrix.config.environment_script }} && python
@@ -211,7 +211,7 @@ jobs:
           --output-path "$ENV{GITHUB_WORKSPACE}"
 
     - name: Build Linux
-      if: matrix.os.config != "Windows"
+      if: matrix.os.config != "windows-latest"
       id: build
       run: |
         python -u
