@@ -153,7 +153,7 @@ jobs:
           --build build
           --qt-path "${{ steps.qt.outputs.qt_dir }}"
           --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
-          --output-path ./libwakatime
+          --output-path %GITHUB_WORKSPACE%
 
 
     - name: Build for Linux
@@ -179,35 +179,19 @@ jobs:
 
         set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
 
-        if ("${{ runner.os }}" STREQUAL "Windows")
-            execute_process(
-              COMMAND python
-                -u
-                ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
-                --name "$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}"
-                --src .
-                --add-config=-DCMAKE_TOOLCHAIN_FILE=$ENV{GITHUB_WORKSPACE}/vcpkg/scripts/buildsystems/vcpkg.cmake
-                --build build
-                --qt-path "${{ steps.qt.outputs.qt_dir }}"
-                --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
-                --output-path "$ENV{GITHUB_WORKSPACE}"
-              RESULT_VARIABLE result
-            )
-        else()
-            execute_process(
-              COMMAND python
-                -u
-                ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
-                --name "$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}"
-                --src .
-                --add-config=-DCMAKE_TOOLCHAIN_FILE=$ENV{GITHUB_WORKSPACE}/vcpkg/scripts/buildsystems/vcpkg.cmake
-                --build build
-                --qt-path "${{ steps.qt.outputs.qt_dir }}"
-                --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
-                --output-path "$ENV{GITHUB_WORKSPACE}"
-              RESULT_VARIABLE result
-            )
-        endif()
+        execute_process(
+          COMMAND python
+            -u
+            ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
+            --name "$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}"
+            --src .
+            --add-config=-DCMAKE_TOOLCHAIN_FILE=$ENV{GITHUB_WORKSPACE}/vcpkg/scripts/buildsystems/vcpkg.cmake
+            --build build
+            --qt-path "${{ steps.qt.outputs.qt_dir }}"
+            --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
+            --output-path "$ENV{GITHUB_WORKSPACE}"
+          RESULT_VARIABLE result
+        )
 
         if (NOT result EQUAL 0)
           string(REGEX MATCH "FAILED:.*$" error_message "${output}")
