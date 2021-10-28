@@ -140,7 +140,23 @@ jobs:
             ${CMAKE_COMMAND} -E tar xvf ../${package}.7z WORKING_DIRECTORY qtcreator)
         endforeach()
 
-    - name: Build
+    - name: Build for Windows
+      if: matrix.config.os == 'windows-latest'
+      run: |
+        ${{ matrix.config.environment_script }} && python
+          -u
+          ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
+          --name "$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}"
+          --src .
+          --add-config=-DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake
+          --build build
+          --qt-path "${{ steps.qt.outputs.qt_dir }}"
+          --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
+          --output-path ./libwakatime
+
+
+    - name: Build for Linux
+      if: matrix.config.os != 'windows-latest'
       shell: cmake -P {0}
       run: |
         set(ENV{CC} ${{ matrix.config.cc }})
