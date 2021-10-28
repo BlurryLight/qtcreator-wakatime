@@ -146,7 +146,7 @@ jobs:
         ${{ matrix.config.environment_script }} && python
           -u
           ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
-          --name "$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}"
+          --name %PLUGIN_NAME%-%QT_CREATOR_VERSION%-${{ matrix.config.artifact }}
           --src .
           --add-config=-DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake
           --build build
