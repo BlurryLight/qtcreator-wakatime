@@ -142,6 +142,7 @@ jobs:
 
     - name: Build for Windows
       if: matrix.config.os == 'windows-latest'
+      shell: cmd
       run: |
         ${{ matrix.config.environment_script }} && python
           -u
