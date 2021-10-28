@@ -142,9 +142,10 @@ jobs:
 
     - name: Build for Windows
       if: matrix.config.os == 'windows-latest'
+      uses: ilammy/msvc-dev-cmd@v1
       shell: cmd
       run: |
-        ${{ matrix.config.environment_script }} && python
+          python
           -u
           ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
           --name %PLUGIN_NAME%-%QT_CREATOR_VERSION%-${{ matrix.config.artifact }}
