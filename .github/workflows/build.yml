@@ -39,8 +39,12 @@ jobs:
       run: sudo apt update && sudo apt install libgl1-mesa-dev
 
     - name: Setup vcpkg
-      id: vcpkg
-      run: git clone https://github.com/microsoft/vcpkg.git
+      if: matrix.config.os == 'windows-latest'
+      run: git clone https://github.com/microsoft/vcpkg.git && ./vcpkg\bootstrap-vcpkg.bat
+
+    - name: Setup vcpkg
+      if: matrix.config.os != 'windows-latest'
+      run: git clone https://github.com/microsoft/vcpkg.git && ./vcpkg/bootstrap-vcpkg.sh
 
     - name: Download Qt
       id: qt
@@ -165,6 +169,7 @@ jobs:
                 ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
                 --name "$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}"
                 --src .
+                --add-config=-DCMAKE_TOOLCHAIN_FILE=$ENV{GITHUB_WORKSPACE}/vcpkg/scripts/buildsystems/vcpkg.cmake
                 --build build
                 --qt-path "${{ steps.qt.outputs.qt_dir }}"
                 --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
@@ -178,6 +183,7 @@ jobs:
                 ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
                 --name "$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}"
                 --src .
+                --add-config=-DCMAKE_TOOLCHAIN_FILE=$ENV{GITHUB_WORKSPACE}/vcpkg/scripts/buildsystems/vcpkg.cmake
                 --build build
                 --qt-path "${{ steps.qt.outputs.qt_dir }}"
                 --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
