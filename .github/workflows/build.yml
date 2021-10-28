@@ -35,7 +35,7 @@ jobs:
 
     - name: Install system libs
       id: install-libs
-      if: matrix.config.os == ubuntu-latest
+      if: matrix.config.os == 'ubuntu-latest'
       run: sudo apt update && sudo apt install libgl1-mesa-dev
 
     - name: Setup vcpkg
