@@ -3,6 +3,8 @@
 #include "waka_options.h"
 #include "waka_options_page.h"
 
+#include <cstring>
+
 #include <coreplugin/icore.h>
 #include <coreplugin/icontext.h>
 #include <coreplugin/actionmanager/actionmanager.h>
@@ -28,19 +30,35 @@
 #include <QJsonDocument>
 #include <QToolButton>
 #include <QTimer>
+#include <QThread>
 
 namespace Wakatime {
 namespace Internal {
 
-WakaPlugin::WakaPlugin()
-{
-    // Create your members
-}
+WakaPlugin::WakaPlugin():_cliIsSetup(false){}
 
 WakaPlugin::~WakaPlugin()
 {
     // Unregister objects from the plugin manager's object pool
     // Delete members
+}
+
+void WakaPlugin::ShowMessagePrompt(const QString str){
+
+#if IDE_LESS_15_VERSION==1
+   Core::MessageManager::write(str);
+#else
+   Core::MessageManager::writeDisrupting(QString(str));
+#endif
+}
+
+QDir WakaPlugin::getWakaCLILocation(){
+    QString default_path = QDir::homePath()+"/.wakatime/wakatime-cli";
+    return default_path;
+}
+
+bool WakaPlugin::checkIfWakaCLIExist(){
+    return getWakaCLILocation().exists();
 }
 
 bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
@@ -54,31 +72,63 @@ bool WakaPlugin::initialize(const QStringList &arguments, QString *errorString)
 
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
-    
+
+    _cliGetter = new CliGetter();
+
+    _cliGettingThread = new QThread(this);
+    _cliGetter->moveToThread(_cliGettingThread);
+
+    connect(this,&WakaPlugin::doneGettingCliAndSettingItUp,
+            this,&WakaPlugin::onDoneSettingUpCLI);
+
+    _cliGettingThread->start();
+
+    //Heartbeat sending signal slot combo
+    connect(this,&WakaPlugin::sendHeartBeat,
+            _cliGetter,&CliGetter::startHearBeat);
+    //for showing prompts
+    connect(_cliGetter,&CliGetter::promptMessage,this,&ShowMessagePrompt);
+
+    //check if has wakatime-cli in path
+    //if not then try download it based of the users operating system
+    if(!checkIfWakaCLIExist()){
+        _cliGetter->connect(_cliGettingThread,&QThread::started,
+                            _cliGetter,&CliGetter::startGettingAssertUrl);
+        connect(_cliGetter,&CliGetter::doneSettingWakaTimeCli,
+                [plugin = this](){
+            plugin->_cliIsSetup=true;
+            emit plugin->doneGettingCliAndSettingItUp();
+        });
+    }else{
+        emit this->doneGettingCliAndSettingItUp();
+    }
+    return true;
+}
+
+void WakaPlugin::onDoneSettingUpCLI(){
+    ShowMessagePrompt("WakatimeCLI setup");
+
+    //check if is latest version
+    //check if user has asked for updated version
+    //if so, then try update the version of wakatime-cli
+
     _req_url = std::make_unique<QUrl>();
     _wakaOptions.reset(new WakaOptions);
     new WakaOptionsPage(_wakaOptions, this);
 
-    _netManager = new QNetworkAccessManager();
-    connect(_netManager, &QNetworkAccessManager::finished, this, &WakaPlugin::onNetReply);
-    connect(_wakaOptions.data(), &WakaOptions::apiKeyChanged, this,
-            &WakaPlugin::onApiKeyChanged);
-    connect(_wakaOptions.data(), &WakaOptions::ignorePaternChanged, this,
-            &WakaPlugin::onIgnorePaternChanged);
-    connect(_wakaOptions.data(), &WakaOptions::inStatusBarChanged, this,
-            &WakaPlugin::onInStatusBarChanged);
+    connect(_wakaOptions.data(), &WakaOptions::inStatusBarChanged,
+            this, &WakaPlugin::onInStatusBarChanged);
 
-    connect(Core::EditorManager::instance(), &Core::EditorManager::aboutToSave, this, &WakaPlugin::onAboutToSave);
-    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorAboutToChange, this, &WakaPlugin::onEditorAboutToChange);
-    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, this, &WakaPlugin::onEditorChanged);
+    connect(Core::EditorManager::instance(), &Core::EditorManager::aboutToSave,
+            this, &WakaPlugin::onAboutToSave);
+    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorAboutToChange,
+            this, &WakaPlugin::onEditorAboutToChange);
+    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged,
+            this, &WakaPlugin::onEditorChanged);
 
-    onApiKeyChanged();
-    onIgnorePaternChanged();
     onInStatusBarChanged();
 
-    QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write(QString("Waka plugin initialized!")));
-
-    return true;
+    QTC_ASSERT(!_wakaOptions->isDebug(),ShowMessagePrompt("Waka plugin initialized!"));
 }
 
 void WakaPlugin::extensionsInitialized()
@@ -93,96 +143,7 @@ ExtensionSystem::IPlugin::ShutdownFlag WakaPlugin::aboutToShutdown()
   // Save settings
   // Disconnect from signals that are not needed during shutdown
   // Hide UI (if you add UI that is not in the main window directly)
-
-  // don't do that. Potential race condition.
-  //    trySendHeartbeat(Core::EditorManager::currentDocument()->filePath().toString(),
-  //    true);
-  QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write(QString(
-                                           "Plugin is going to shutdown\n")));
   return SynchronousShutdown;
-}
-
-void WakaPlugin::trySendHeartbeat(const QString &entry, bool isSaving = false)
-{
-  thread_local QJsonObject heartbeat{
-      {"entity", QString()},
-      {"entity_type", QString("file")},
-      {"category", QString("coding")},
-      {"time", 0},
-      {"project", QString("")},
-      {"exclude", QString("")},
-      {"branch", QString("master")},
-      {"plugin", QString("QtCreator-wakatime/0.1.0")},
-      {"is_write", false},
-      {"is_debugging", false},
-      {"lineno", 1},
-      {"language", QString("C++")}};
-
-  QTC_ASSERT(_wakaOptions->isEnabled(),
-             QTC_ASSERT(!_wakaOptions->isDebug(),
-                        Core::MessageManager::write(
-                            "Wakatime reporting explicitly disabled!"));
-             return;);
-  QTC_ASSERT(_wakaOptions->hasKey(),
-             Core::MessageManager::write(
-                 "API key not set! Wakatime reporting disabled!");
-             return;);
-
-  qint64 curr_time = time(nullptr);
-  if (curr_time - _lastTime < _cooldownTime && !isSaving &&
-      _lastEntry == entry) {
-    QTC_ASSERT(!_wakaOptions->isDebug(),
-               Core::MessageManager::write(
-                   QString("Heartbeat NOT send dt => %1, is_write => %2")
-                       .arg(curr_time - _lastTime)
-                       .arg(isSaving)));
-    return;
-    }
-
-    heartbeat["entity"] = _lastEntry = entry;
-    heartbeat["time"] = _lastTime = curr_time;
-    heartbeat["project"] = ProjectExplorer::ProjectTree::currentProject()->displayName();
-    heartbeat["is_write"] = isSaving;
-    heartbeat["is_debugging"] = _wakaOptions->isDebug();
-    heartbeat["exclude"] = _ignore_patern;
-    heartbeat["lineno"] = Core::EditorManager::currentEditor()->currentLine();
-
-    QJsonDocument jdoc(heartbeat);
-    QByteArray heartbeat_json = jdoc.toJson();
-
-    QNetworkRequest request;
-    QSslConfiguration config = QSslConfiguration::defaultConfiguration();
-    config.setProtocol(QSsl::TlsV1_2);
-    request.setSslConfiguration(config);
-    request.setUrl(*_req_url.get());
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    QString useragent;
-    useragent = QString("%1-%2-Qt Creator wakatime Qt %3")
-                    .arg(QSysInfo::kernelType(), QSysInfo::kernelVersion(),
-                         QT_VERSION_STR);
-    request.setHeader(QNetworkRequest::UserAgentHeader, useragent);
-    _netManager->post(request, heartbeat_json);
-
-    QTC_ASSERT(!_wakaOptions->isDebug(), Core::MessageManager::write(QString("Heartbeat send => %1 ").arg(QString::fromUtf8(heartbeat_json))));
-
-    if(_wakaOptions->inStatusBar())
-    {
-        _heartBeatButton->setDisabled(false);
-        QTimer::singleShot(200, [this]()
-        {
-            _heartBeatButton->setDisabled(true);
-        });
-    }
-}
-
-void WakaPlugin::onIgnorePaternChanged()
-{
-    _ignore_patern = _wakaOptions->ignorePatern();
-}
-
-void WakaPlugin::onApiKeyChanged()
-{
-    _req_url->setUrl(_urlPrefix + _wakaOptions->apiKey());
 }
 
 void WakaPlugin::onInStatusBarChanged()
@@ -201,24 +162,14 @@ void WakaPlugin::onInStatusBarChanged()
     }
 }
 
-void WakaPlugin::onNetReply(QNetworkReply *reply) {
-  QTC_ASSERT(!_wakaOptions->isDebug(),
-             Core::MessageManager::write(
-                 QString("Network reply => %1")
-                     .arg(QString::fromUtf8(reply->readAll()))));
-  int status =
-      reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-  QTC_ASSERT(!_wakaOptions->isDebug(),
-             Core::MessageManager::write(
-                 QString("Network reply code => %1").arg(QString(status))));
-}
-
 void WakaPlugin::onEditorAboutToChange(Core::IEditor *editor)
 {
     if(!editor)
         return;
 
-    disconnect(TextEditor::TextEditorWidget::currentTextEditorWidget(), &TextEditor::TextEditorWidget::textChanged, this, &WakaPlugin::onEditorStateChanged);
+    disconnect(TextEditor::TextEditorWidget::currentTextEditorWidget(),
+               &TextEditor::TextEditorWidget::textChanged,
+               this, &WakaPlugin::onEditorStateChanged);
 }
 
 void WakaPlugin::onEditorChanged(Core::IEditor *editor)
@@ -227,17 +178,18 @@ void WakaPlugin::onEditorChanged(Core::IEditor *editor)
         return;
 
     connect(TextEditor::TextEditorWidget::currentTextEditorWidget(), &TextEditor::TextEditorWidget::textChanged, this, &WakaPlugin::onEditorStateChanged);
-    trySendHeartbeat(editor->document()->filePath().toString());
+    emit this->sendHeartBeat(editor->document()->filePath().toString());
 }
 
 void WakaPlugin::onAboutToSave(Core::IDocument *document)
 {
-    trySendHeartbeat(document->filePath().toString(), true);
+    //emit signal for sending here.
+    emit sendHeartBeat(document->filePath().toString());
 }
 
 void WakaPlugin::onEditorStateChanged()
 {
-    trySendHeartbeat(Core::EditorManager::currentDocument()->filePath().toString());
+    emit sendHeartBeat(Core::EditorManager::currentDocument()->filePath().toString());
 }
 
 } // namespace Internal

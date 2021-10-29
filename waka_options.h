@@ -26,13 +26,13 @@ public:
     bool inStatusBar() const;
     bool hasKey() const;
     QString apiKey() const;
-    QString ignorePatern() const;
+    QString excludePattern() const;
 
     void setDebug(bool val);
     void setEnabled(bool val);
     void setStatusBar(bool val);
     void setApiKey(const QString &val);
-    void setIgnorePatern(const QString &val);
+    void setExcludePatern(const QString &val);
 
 signals:
     void apiKeyChanged();
@@ -42,9 +42,10 @@ signals:
 private:
     bool _isDebug = true;
     bool _isEnabled = true;
-    bool _inStatusBar = false;
+    bool _statusBarEnabled = false;
     QString _apiKey;
-    QString _ignorePatern;
+    QString _excludePattern;
+    QString _wakatimeCFG;
 };
 
 } // namespace Internal

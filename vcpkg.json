@@ -1,0 +1,12 @@
+{
+	"name": "wakatime",
+	"version-string":"1.0.0",
+	"dependencies":[
+		"zlib",
+		"openssl"
+	],
+	"overrides":[
+		{"name":"openssl", "version-string":"1.1.1l"}
+	],
+	"builtin-baseline":"078f3e51efd5ea6072d0ba28d11baa946519a2ce"
+}
