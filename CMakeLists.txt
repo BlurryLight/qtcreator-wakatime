@@ -74,9 +74,9 @@ add_qtc_plugin(${PROJECT_NAME}
 )
 
 # set the definition for the version, important for breaking changes in 4.14 between 5.0
-string(COMPARE LESS ${IDE_QT_VERSION_MIN} "5.15.0" IDE_LESS_15_VERSION)
+string(COMPARE LESS ${IDE_VERSION} "4.15.0" IDE_LESS_15_VERSION)
 target_compile_definitions(${PROJECT_NAME} PUBLIC IDE_LESS_15_VERSION=${IDE_LESS_15_VERSION})
-message(STATUS "QTCREATOR_VERSION: ${IDE_LESS_15_VERSION}")
+message(STATUS "QTCREATOR_VERSION:${IDE_QT_VERSION_MIN} ${IDE_VERSION} ${IDE_LESS_15_VERSION}")
 
 # add information about version
 target_compile_definitions(${PROJECT_NAME} PUBLIC WAKATIME_PLUGIN_VERSION="${CMAKE_PROJECT_VERSION}")
