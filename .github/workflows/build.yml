@@ -211,12 +211,6 @@ jobs:
           message(FATAL_ERROR "Build failed")
         endif()
 
-    - name: debug
-      if: matrix.config.os == 'windows-latest'
-      env:
-          TMATE_ENCRYPT_PASSWORD: ${{secrets.TMATE_ENCRYPT_PASSWORD}}
-      uses: tete1030/safe-debugger-action@master
-
     - uses: actions/upload-artifact@v2
       id: upload_artifact
       with:
