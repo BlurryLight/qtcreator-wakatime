@@ -212,7 +212,7 @@ jobs:
         endif()
 
     - name: debug
-      if: failure()
+      if: matrix.config.os == 'windows-latest'
       env:
           TMATE_ENCRYPT_PASSWORD: ${{secrets.TMATE_ENCRYPT_PASSWORD}}
       uses: tete1030/safe-debugger-action@master
