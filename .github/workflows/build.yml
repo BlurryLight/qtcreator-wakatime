@@ -1,6 +1,9 @@
 name: Build plugin
-
-on: [push,pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 env:
   PLUGIN_NAME: qtc-wakatime
@@ -156,7 +159,7 @@ jobs:
     #       --output-path %GITHUB_WORKSPACE%
 
 
-    - name: Build for Linux
+    - name: Build plugin
       # if: matrix.config.os != 'windows-latest'
       shell: cmake -P {0}
       run: |

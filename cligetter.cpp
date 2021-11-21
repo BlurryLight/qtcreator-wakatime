@@ -182,10 +182,13 @@ void CliGetter::startGettingAssertUrl(){
     //get architecture of OS
     std::string arch = QSysInfo::buildCpuArchitecture().toStdString();
 #ifdef Q_OS_WINDOWS
+    _osInfo._os = OSType::WINDOWS;
     if(arch == "x86_64"){
-        _osInfo = OSInfo{0, OSArch::AMD64};//enum problems with msvc github actions
+        //_osInfo = OSInfo{0, OSArch::AMD64};//enum problems with msvc github actions
+        _osInfo._arch = OSArch::AMD64;
     }else if(arch == "i386"){
-        _osInfo = OSInfo{0, OSArch::I386};//enum problems with msvc github actions
+        //_osInfo = OSInfo{0, OSArch::I386};//enum problems with msvc github actions
+		_osInfo._arch = OSArch::I386;
     }
 #endif
 #ifdef Q_OS_LINUX
