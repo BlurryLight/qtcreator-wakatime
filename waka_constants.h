@@ -12,7 +12,7 @@ const QString WAKATIME_RELEASE_URL =
         "https://api.github.com/repos/wakatime/wakatime-cli/releases/latest";
 
 enum OSType{
-    WINDOWS=0,LINUX,MACOS,UNKOWN
+    WIN=0,LINUX,MACOS,UNKOWN
 };
 
 enum OSArch{

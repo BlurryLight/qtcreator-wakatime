@@ -15,7 +15,7 @@ class QNetworkReply;
 class QToolButton;
 
 namespace Core {
-    class IEditor;    
+    class IEditor;
     class IDocument;
 }
 
@@ -58,7 +58,7 @@ private slots:
 
     void onInStatusBarChanged();
 
-    void onNetReply(QNetworkReply *reply);
+    void onNetReply(QNetworkReply *reply){};
     void onDoneSettingUpCLI();
 
 signals:

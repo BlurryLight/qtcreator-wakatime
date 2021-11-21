@@ -1,9 +1,12 @@
 name: Build plugin
-
-on: [push,pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 env:
-  PLUGIN_NAME: Untitled
+  PLUGIN_NAME: qtc-wakatime
   QT_VERSION: 5.15.2
   QT_CREATOR_VERSION: 4.14.1
   QT_CREATOR_SNAPSHOT: NO
@@ -140,24 +143,24 @@ jobs:
             ${CMAKE_COMMAND} -E tar xvf ../${package}.7z WORKING_DIRECTORY qtcreator)
         endforeach()
 
-    - name: Build for Windows
-      if: matrix.config.os == 'windows-latest'
-      shell: cmd
-      run: |
-        "${{ matrix.config.environment_script }}" && python
-          -u
-          ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
-          --name %PLUGIN_NAME%-%QT_CREATOR_VERSION%-${{ matrix.config.artifact }}
-          --src .
-          --add-config=-DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake
-          --build build
-          --qt-path "${{ steps.qt.outputs.qt_dir }}"
-          --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
-          --output-path %GITHUB_WORKSPACE%
+    # - name: Build for Windows
+    #   if: matrix.config.os == 'windows-latest'
+    #   shell: cmd
+    #   run: |
+    #     "${{ matrix.config.environment_script }}" && python
+    #       -u
+    #       ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
+    #       --name %PLUGIN_NAME%-%QT_CREATOR_VERSION%-${{ matrix.config.artifact }}
+    #       --src .
+    #       --add-config=-DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake
+    #       --build build
+    #       --qt-path "${{ steps.qt.outputs.qt_dir }}"
+    #       --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
+    #       --output-path %GITHUB_WORKSPACE%
 
 
-    - name: Build for Linux
-      if: matrix.config.os != 'windows-latest'
+    - name: Build plugin
+      # if: matrix.config.os != 'windows-latest'
       shell: cmake -P {0}
       run: |
         set(ENV{CC} ${{ matrix.config.cc }})
@@ -179,10 +182,18 @@ jobs:
 
         set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
 
+        set(build_plugin_py "scripts/build_plugin.py")
+        foreach(dir "share/qtcreator/scripts" "Qt Creator.app/Contents/Resources/scripts" "Contents/Resources/scripts")
+          if(EXISTS "${{ steps.qt_creator.outputs.qtc_dir }}/${dir}/build_plugin.py")
+            set(build_plugin_py "${dir}/build_plugin.py")
+            break()
+          endif()
+        endforeach()
+
         execute_process(
           COMMAND python
             -u
-            ${{ steps.qt_creator.outputs.qtc_dir }}/scripts/build_plugin.py
+            ${{ steps.qt_creator.outputs.qtc_dir }}/${build_plugin_py}
             --name "$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}"
             --src .
             --add-config=-DCMAKE_TOOLCHAIN_FILE=$ENV{GITHUB_WORKSPACE}/vcpkg/scripts/buildsystems/vcpkg.cmake
